@@ -51,14 +51,15 @@ public class ServiceMap {
     }
 
     public static synchronized void unregisterServices(List<String> servicesNames) {
-        for (String serviceName : servicesNames) {
-            String tmpServiceName = AVAILABLE_SERVICES.remove(serviceName);
-            if (tmpServiceName==null) {
-                LOGGER.warn("Cannot deregister service '{}'. The service wasn't registered!", serviceName);
-            }
-            else {
-                LOGGER.info("Deregistered service '{}' from queue address '{}'",
-                        new Object[]{serviceName, tmpServiceName});
+        if (servicesNames != null) {
+            for (String serviceName : servicesNames) {
+                String tmpServiceName = AVAILABLE_SERVICES.remove(serviceName);
+                if (tmpServiceName == null) {
+                    LOGGER.warn("Cannot deregister service '{}'. The service wasn't registered!", serviceName);
+                } else {
+                    LOGGER.info("Deregistered service '{}' from queue address '{}'",
+                            new Object[] { serviceName, tmpServiceName });
+                }
             }
         }
     }
