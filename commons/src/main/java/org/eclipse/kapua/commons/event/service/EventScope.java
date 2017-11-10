@@ -17,6 +17,12 @@ import java.util.UUID;
 import org.eclipse.kapua.commons.event.service.internal.KapuaEventImpl;
 import org.eclipse.kapua.service.event.KapuaEvent;
 
+/**
+ * Utility class to handle the thread context Kapua event stack.
+ * 
+ * @since 1.0
+ *
+ */
 public class EventScope {
 
     private static ThreadLocal<Stack<KapuaEvent>> eventContextThdLocal = new ThreadLocal<>();
@@ -24,6 +30,11 @@ public class EventScope {
     private EventScope() {
     }
 
+    /**
+     * Append the Kapua event to the current thread context Kapua event stack (setting a new context id in the Kapua event)
+     * 
+     * @return
+     */
     public static KapuaEvent begin() {
 
         // Is it the first call in the stack? Is there already a Stack?
@@ -48,6 +59,22 @@ public class EventScope {
         return eventStack.peek();
     }
 
+    /**
+     * Create a new thread context Kapua event stack and set the Kapua event at the top
+     * 
+     * @param kapuaEvent
+     */
+    public static void set(KapuaEvent kapuaEvent) {
+        Stack<KapuaEvent> eventStack = new Stack<>();
+        eventStack.push(kapuaEvent);
+        eventContextThdLocal.set(eventStack);
+    }
+
+    /**
+     * Get the current Kapua event from the thread context Kapua event stack
+     * 
+     * @return
+     */
     public static KapuaEvent get() {
         Stack<KapuaEvent> tmp = eventContextThdLocal.get();
         if (tmp != null && !tmp.empty()) {
@@ -56,6 +83,9 @@ public class EventScope {
         return null;
     }
 
+    /**
+     * Clean up the current thread context Kapua event stack
+     */
     public static void end() {
         Stack<KapuaEvent> eventStack = eventContextThdLocal.get();
         if (eventStack != null && !eventStack.empty()) {

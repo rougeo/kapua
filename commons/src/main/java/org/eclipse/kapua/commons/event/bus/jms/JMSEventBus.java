@@ -20,6 +20,7 @@ import org.apache.qpid.jms.JmsConnectionFactory;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.KapuaRuntimeException;
 import org.eclipse.kapua.commons.event.bus.EventBusMarshaler;
+import org.eclipse.kapua.commons.event.service.EventScope;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.commons.setting.system.SystemSetting;
@@ -264,8 +265,15 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
                                     final KapuaEvent kapuaEvent = eventBusMarshaler.unmarshal(textMessage);
                                     setSession(kapuaEvent);
                                     KapuaSecurityUtils.doPrivileged(() -> {
-                                        subscription.getKapuaEventListener().onKapuaEvent(kapuaEvent);
+                                        try {
+                                            // restore event context
+                                            EventScope.set(kapuaEvent);
+                                            subscription.getKapuaEventListener().onKapuaEvent(kapuaEvent);
+                                        } finally {
+                                            EventScope.end();
+                                        }
                                     });
+
                                 } else {
                                     LOGGER.error("Discarding wrong event message type '{}'", message != null ? message.getClass() : "null");
                                 }

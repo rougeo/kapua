@@ -41,7 +41,6 @@ import org.eclipse.kapua.service.authorization.permission.Actions;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.event.KapuaEvent;
 import org.eclipse.kapua.service.event.KapuaEventBusListener;
-import org.eclipse.kapua.service.event.ListenKapuaEvent;
 import org.eclipse.kapua.service.event.RaiseKapuaEvent;
 
 /**
@@ -344,7 +343,6 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
     }
 
     @Override
-    @ListenKapuaEvent
     public void onKapuaEvent(KapuaEvent kapuaEvent) throws KapuaException {
         // TODO Auto-generated method stub
 
