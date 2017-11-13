@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.event;
+package org.eclipse.kapua.commons.event.service.api;
 
 import org.eclipse.kapua.model.KapuaUpdatableEntityPredicates;
 

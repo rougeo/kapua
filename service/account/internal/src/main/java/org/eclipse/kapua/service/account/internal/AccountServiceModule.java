@@ -19,9 +19,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.core.ServiceModule;
+import org.eclipse.kapua.commons.event.EventStoreHouseKeeperJob;
+import org.eclipse.kapua.commons.event.ServiceMap;
 import org.eclipse.kapua.commons.event.bus.EventBusManager;
-import org.eclipse.kapua.commons.event.service.EventStoreHouseKeeperJob;
-import org.eclipse.kapua.commons.event.service.internal.ServiceMap;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.service.account.internal.setting.KapuaAccountSetting;
 import org.eclipse.kapua.service.account.internal.setting.KapuaAccountSettingKeys;

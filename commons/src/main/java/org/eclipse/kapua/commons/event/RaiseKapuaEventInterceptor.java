@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event.service;
+package org.eclipse.kapua.commons.event;
 
 import java.lang.annotation.Annotation;
 import java.util.Date;
@@ -17,8 +17,8 @@ import java.util.Date;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.eclipse.kapua.commons.event.bus.EventBusManager;
+import org.eclipse.kapua.commons.event.service.api.EventUtil;
 import org.eclipse.kapua.commons.event.service.internal.KapuaEventStoreDAO;
-import org.eclipse.kapua.commons.event.service.internal.ServiceMap;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.commons.service.internal.AbstractKapuaService;
@@ -27,14 +27,14 @@ import org.eclipse.kapua.model.KapuaEntity;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.service.KapuaService;
 import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEvent.EventStatus;
 import org.eclipse.kapua.service.event.KapuaEventBusException;
 import org.eclipse.kapua.service.event.RaiseKapuaEvent;
+import org.eclipse.kapua.service.event.KapuaEvent.EventStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Event interceptor
+ * Event interceptor. It builds the event object and sends it to the event bus.
  * 
  * @since 1.0
  */
@@ -50,21 +50,21 @@ public class RaiseKapuaEventInterceptor implements MethodInterceptor {
 
         try {
             // if(!create) then the entity id can be set here
-            KapuaEvent kapuaEvent = EventScope.begin();
+            KapuaEvent serviceEvent = EventScope.begin();
 
             KapuaSession session = KapuaSecurityUtils.getSession();
             // Context ID is initialized/managed by the EventScope object
-            kapuaEvent.setTimestamp(new Date());
-            kapuaEvent.setUserId(session.getUserId());
-            kapuaEvent.setScopeId(session.getScopeId());
-            fillEvent(invocation, kapuaEvent);
+            serviceEvent.setTimestamp(new Date());
+            serviceEvent.setUserId(session.getUserId());
+            serviceEvent.setScopeId(session.getScopeId());
+            fillEvent(invocation, serviceEvent);
 
             //execute the business logic
             returnObject = invocation.proceed();
 
             // Raise service event if the execution is successful
             try {
-                sendEvent(invocation, kapuaEvent, returnObject);
+                sendEvent(invocation, serviceEvent, returnObject);
             }
             catch (KapuaEventBusException e) {
                 LOGGER.warn("Error sending event: {}", e.getMessage(), e);
@@ -77,7 +77,7 @@ public class RaiseKapuaEventInterceptor implements MethodInterceptor {
         }
     }
 
-    private void fillEvent(MethodInvocation invocation, KapuaEvent kapuaEvent) {
+    private void fillEvent(MethodInvocation invocation, KapuaEvent serviceEvent) {
         //fill the inputs
         StringBuilder inputs = new StringBuilder();
         for (Object obj : invocation.getArguments()) {
@@ -87,12 +87,12 @@ public class RaiseKapuaEventInterceptor implements MethodInterceptor {
         if (inputs.length()>2) {
             inputs.replace(inputs.length()-2, inputs.length(), "");
         }
-        kapuaEvent.setInputs(inputs.toString());
+        serviceEvent.setInputs(inputs.toString());
         if (invocation.getThis() instanceof AbstractKapuaService) {
             //get the service name
             //the service is wrapped by guice so getThis --> getSuperclass() should provide the intercepted class
             //then keep the interface from this object
-            kapuaEvent.setOperation(invocation.getMethod().getName());
+            serviceEvent.setOperation(invocation.getMethod().getName());
             Class<?> wrappedClass = ((AbstractKapuaService)invocation.getThis()).getClass().getSuperclass(); //this object should be not null
             Class<?>[] impementedClass = wrappedClass.getInterfaces();
             //assuming that the KapuaService implemented is specified by the first implementing interface
@@ -101,14 +101,14 @@ public class RaiseKapuaEventInterceptor implements MethodInterceptor {
             String serviceName = splittedServiceInterfaceName.length > 0 ? splittedServiceInterfaceName[splittedServiceInterfaceName.length-1] : "";
             String cleanedServiceName = serviceName.substring(0, serviceName.length()-"Service".length()).toLowerCase();
             LOGGER.info("Service name '{}' ", cleanedServiceName);
-            kapuaEvent.setService(cleanedServiceName);
+            serviceEvent.setService(cleanedServiceName);
             Object[] arguments = invocation.getArguments();
             if (arguments!=null) {
                 for (Object tmp : arguments) {
                     LOGGER.info("Scan for entity. Object: {}", tmp!=null ? tmp.getClass() : "null");
                     if (tmp instanceof KapuaEntity) {
-                        kapuaEvent.setEntityType(tmp.getClass().getName());
-                        kapuaEvent.setEntityId(((KapuaEntity) tmp).getId());
+                        serviceEvent.setEntityType(tmp.getClass().getName());
+                        serviceEvent.setEntityId(((KapuaEntity) tmp).getId());
                         LOGGER.info("Entity '{}' with id '{}' found!", new Object[]{tmp.getClass().getName(), ((KapuaEntity) tmp).getId()});
                         return;
                     }
@@ -126,14 +126,14 @@ public class RaiseKapuaEventInterceptor implements MethodInterceptor {
                     }
                 }
                 if (kapuaIdFound>0) {
-                    kapuaEvent.setEntityId(((KapuaId) arguments[kapuaIdPosition]));
+                    serviceEvent.setEntityId(((KapuaId) arguments[kapuaIdPosition]));
                     String serviceInterface = impementedClass[0].getAnnotatedInterfaces()[0].getType().getTypeName();
                     String genericsList = serviceInterface.substring(serviceInterface.indexOf('<')+1, serviceInterface.indexOf('>'));
                     String[] entityClassesToScan = genericsList.replaceAll("\\,", "").split(" ");
                     for (String str : entityClassesToScan) {
                         try {
                             if (KapuaEntity.class.isAssignableFrom(Class.forName(str))) {
-                                kapuaEvent.setEntityType(str);
+                                serviceEvent.setEntityType(str);
                             }
                         } catch (ClassNotFoundException e) {
                             //do nothing
@@ -148,36 +148,37 @@ public class RaiseKapuaEventInterceptor implements MethodInterceptor {
             for (Annotation annotation : annotations) {
                 if (RaiseKapuaEvent.class.isAssignableFrom(annotation.annotationType())) {
                     RaiseKapuaEvent raiseKapuaEvent = (RaiseKapuaEvent) annotation;
-                    kapuaEvent.setService(raiseKapuaEvent.service());
-                    kapuaEvent.setEntityType(raiseKapuaEvent.entityType());
-                    kapuaEvent.setOperation(raiseKapuaEvent.operation());
-                    kapuaEvent.setNote(raiseKapuaEvent.note());
+                    serviceEvent.setService(raiseKapuaEvent.service());
+                    serviceEvent.setEntityType(raiseKapuaEvent.entityType());
+                    serviceEvent.setOperation(raiseKapuaEvent.operation());
+                    serviceEvent.setNote(raiseKapuaEvent.note());
                     break;
                 }
             }
         }
     }
 
-    private void sendEvent(MethodInvocation invocation, KapuaEvent kapuaEvent, Object returnedValue) throws KapuaEventBusException {
-        String address = ServiceMap.getQueueAddress(kapuaEvent.getService());
+    private void sendEvent(MethodInvocation invocation, KapuaEvent serviceEvent, Object returnedValue) throws KapuaEventBusException {
+        String address = ServiceMap.getAddress(serviceEvent.getService());
         try {
-            EventBusManager.getInstance().publish(address, kapuaEvent);
-            LOGGER.info("SENT event from service {} - entity type {} - entity id {} - context id {}", new Object[]{kapuaEvent.getService(), kapuaEvent.getEntityType(), kapuaEvent.getEntityId(), kapuaEvent.getContextId()});
+            EventBusManager.getInstance().publish(address, serviceEvent);
+            LOGGER.info("SENT event from service {} - entity type {} - entity id {} - context id {}",
+                    new Object[] { serviceEvent.getService(), serviceEvent.getEntityType(), serviceEvent.getEntityId(), serviceEvent.getContextId() });
             //if message was sent successfully then confirm the event in the event table
-            updateEventStatus(invocation, kapuaEvent, EventStatus.SENT);
+            updateEventStatus(invocation, serviceEvent, EventStatus.SENT);
         }
         catch (KapuaEventBusException e) {
             LOGGER.warn("Error sending event", e);
             //mark event status as SEND_ERROR
-            updateEventStatus(invocation, kapuaEvent, EventStatus.SEND_ERROR);
+            updateEventStatus(invocation, serviceEvent, EventStatus.SEND_ERROR);
         }
     }
 
-    private void updateEventStatus(MethodInvocation invocation, KapuaEvent kapuaEvent, EventStatus newEventStatus) {
+    private void updateEventStatus(MethodInvocation invocation, KapuaEvent serviceEvent, EventStatus newServiceEventStatus) {
         if (invocation.getThis() instanceof AbstractKapuaService) {
             try {
-                kapuaEvent.setStatus(newEventStatus);
-                ((AbstractKapuaService) invocation.getThis()).getEntityManagerSession().onTransactedAction(em -> KapuaEventStoreDAO.update(em, kapuaEvent));
+                serviceEvent.setStatus(newServiceEventStatus);
+                ((AbstractKapuaService) invocation.getThis()).getEntityManagerSession().onTransactedAction(em -> KapuaEventStoreDAO.update(em, EventUtil.fromServiceEventBus(serviceEvent)));
             }
             catch (Throwable t) {
                 //this may be a valid condition if the HouseKeeper is doing the update concurrently with this task

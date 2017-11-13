@@ -11,19 +11,19 @@
  *******************************************************************************/
 package org.eclipse.kapua.commons.event.service.internal;
 
+import org.eclipse.kapua.commons.event.service.api.Event;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventCreator;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventListResult;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreFactory;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreQuery;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.id.KapuaId;
-import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEventCreator;
-import org.eclipse.kapua.service.event.KapuaEventStoreFactory;
-import org.eclipse.kapua.service.event.KapuaEventListResult;
-import org.eclipse.kapua.service.event.KapuaEventStoreQuery;
 
 @KapuaProvider
 public class KapuaEventStoreFactoryImpl implements KapuaEventStoreFactory {
 
     @Override
-    public KapuaEvent newEntity(KapuaId scopeId) {
+    public Event newEntity(KapuaId scopeId) {
         return new KapuaEventImpl(scopeId);
     }
 

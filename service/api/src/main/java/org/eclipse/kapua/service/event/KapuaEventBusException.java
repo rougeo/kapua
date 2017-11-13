@@ -14,18 +14,31 @@ package org.eclipse.kapua.service.event;
 import org.eclipse.kapua.KapuaErrorCodes;
 import org.eclipse.kapua.KapuaException;
 
+/**
+ * Event bus exception
+ * 
+ * @since 1.0
+ *
+ */
 public class KapuaEventBusException extends KapuaException {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -7004520562049645299L;
 
+    /**
+     * Constructs an event bus exception with the provided parameters
+     * 
+     * @param cause
+     */
     public KapuaEventBusException(Throwable cause) {
         // TODO Add error code for event bus
         super(KapuaErrorCodes.INTERNAL_ERROR, cause, (Object[])null);
     }
 
+    /**
+     * Constructs an event bus exception with the provided parameters
+     * 
+     * @param message
+     */
     public KapuaEventBusException(String message) {
         // TODO Add error code for event bus
         super(KapuaErrorCodes.INTERNAL_ERROR, message);

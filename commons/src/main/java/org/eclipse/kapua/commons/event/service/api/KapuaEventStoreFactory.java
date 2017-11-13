@@ -9,18 +9,16 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event.service;
+package org.eclipse.kapua.commons.event.service.api;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.eclipse.kapua.model.KapuaEntityFactory;
 
-@Retention(RetentionPolicy.RUNTIME) 
-@Target(ElementType.TYPE)
-public @interface InterceptorBind {
+/**
+ * KapuaEvent factory service definition.
+ * 
+ * @since 1.0
+ * 
+ */
+public interface KapuaEventStoreFactory extends KapuaEntityFactory<Event, KapuaEventCreator, KapuaEventStoreQuery, KapuaEventListResult> {
 
-    Class<?> matchSubclassOf() ;
-    Class<? extends Annotation> matchAnnotatedWith();
 }

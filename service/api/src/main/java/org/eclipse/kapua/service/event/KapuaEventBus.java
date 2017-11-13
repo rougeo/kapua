@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2016 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -11,14 +11,34 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.event;
 
-import org.eclipse.kapua.service.event.KapuaEvent;
-
 /**
- * @since 0.3.0
+ * Service event bus definition.
+ * 
+ * @since 1.0
  */
 public interface KapuaEventBus {
 
+    /**
+     * Publish the event to the bus
+     * 
+     * @param address
+     *            address in which to publish the event
+     * @param event
+     *            event to publish
+     * @throws KapuaEventBusException
+     */
     public void publish(String address, KapuaEvent event) throws KapuaEventBusException;
 
+    /**
+     * Subscribe for a specific address event
+     * 
+     * @param address
+     *            address to listen for events
+     * @param name
+     *            subscriber name. It's used to share events between multiple instances of the same consumer.
+     * @param eventListener
+     *            listener to invoke when an event is received
+     * @throws KapuaEventBusException
+     */
     public void subscribe(String address, String name, KapuaEventBusListener eventListener) throws KapuaEventBusException;
 }

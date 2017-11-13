@@ -11,16 +11,16 @@
  *******************************************************************************/
 package org.eclipse.kapua.commons.event.service.internal;
 
+import org.eclipse.kapua.commons.event.service.api.Event;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventListResult;
 import org.eclipse.kapua.commons.model.query.KapuaListResultImpl;
-import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEventListResult;
 
 /**
  * KapuaEvent list result implementation.
  *
  * @since 1.0
  */
-public class KapuaEventListResultImpl extends KapuaListResultImpl<KapuaEvent> implements KapuaEventListResult {
+public class KapuaEventListResultImpl extends KapuaListResultImpl<Event> implements KapuaEventListResult {
 
     private static final long serialVersionUID = -5118004898345748297L;
 }

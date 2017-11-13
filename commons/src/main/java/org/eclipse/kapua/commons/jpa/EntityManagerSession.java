@@ -15,13 +15,14 @@ import javax.persistence.PersistenceException;
 
 import org.eclipse.kapua.KapuaEntityExistsException;
 import org.eclipse.kapua.KapuaException;
-import org.eclipse.kapua.commons.event.service.EventScope;
+import org.eclipse.kapua.commons.event.EventScope;
+import org.eclipse.kapua.commons.event.service.api.Event;
+import org.eclipse.kapua.commons.event.service.api.EventUtil;
 import org.eclipse.kapua.commons.event.service.internal.KapuaEventStoreDAO;
 import org.eclipse.kapua.commons.setting.system.SystemSetting;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
 import org.eclipse.kapua.commons.util.KapuaExceptionUtils;
 import org.eclipse.kapua.model.KapuaEntity;
-import org.eclipse.kapua.service.event.KapuaEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -233,36 +234,37 @@ public class EntityManagerSession {
         return instance;
     }
 
-    private <T> KapuaEvent appendKapuaEvent(EntityManager manager) throws KapuaException {
+    private <T> Event appendKapuaEvent(EntityManager manager) throws KapuaException {
         return appendKapuaEvent(null, manager);
     }
 
-    private <T> KapuaEvent appendKapuaEvent(Object instance, EntityManager manager) throws KapuaException {
-        KapuaEvent persistedKapuaEvent = null;
+    private <T> Event appendKapuaEvent(Object instance, EntityManager manager) throws KapuaException {
+        Event persistedKapuaEvent = null;
 
         //persist the kapua event only if the instance is not a kapua event instance
-        if (!(instance instanceof KapuaEvent)) {
+        if (!(instance instanceof Event)) {
 
             // If a kapua event is in scope then persist it along with the entity
-            KapuaEvent kapuaEvent = EventScope.get();
-            if (kapuaEvent!=null) {
+            org.eclipse.kapua.service.event.KapuaEvent event = EventScope.get();
+            if (event != null) {
                 if (instance instanceof KapuaEntity) {
                     //make sense to override the entity id and type without checking for previous empty values?
                     //override only if parameters are not evaluated
-                    if (kapuaEvent.getEntityType() == null || kapuaEvent.getEntityType().trim().length()<=0) {
+                    if (event.getEntityType() == null || event.getEntityType().trim().length() <= 0) {
                         logger.debug("Kapua event - update entity type to '{}'", instance.getClass().getName());
-                        kapuaEvent.setEntityType(instance.getClass().getName());
+                        event.setEntityType(instance.getClass().getName());
                     }
-                    if (kapuaEvent.getEntityId()==null) {
+                    if (event.getEntityId() == null) {
                         logger.debug("Kapua event - update entity id to '{}'", ((KapuaEntity) instance).getId());
-                        kapuaEvent.setEntityId(((KapuaEntity) instance).getId());
+                        event.setEntityId(((KapuaEntity) instance).getId());
                     }
                     logger.info("Entity '{}' with id '{}' found!", new Object[]{instance.getClass().getName(), ((KapuaEntity) instance).getId()});
                 }
 
                 //insert the kapua event only if it's a new entity
-                if (isNewEntity(kapuaEvent)) {
-                    persistedKapuaEvent = KapuaEventStoreDAO.create(manager, kapuaEvent);
+                Event eventEntity = EventUtil.fromServiceEventBus(event);
+                if (isNewEntity(eventEntity)) {
+                    persistedKapuaEvent = KapuaEventStoreDAO.create(manager, eventEntity);
                 }
             }
         }

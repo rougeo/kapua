@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.event;
+package org.eclipse.kapua.commons.event.service.api;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -27,7 +27,7 @@ public class KapuaEventStoreXmlRegistry {
      * 
      * @return
      */
-    public KapuaEvent newKapuaEvent() {
+    public Event newKapuaEvent() {
         return kapuaEventFactory.newEntity(null);
     }
 

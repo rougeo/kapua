@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event.service.internal;
+package org.eclipse.kapua.commons.event;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +18,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class used to handle the mapping between services and address used to republish events.
+ * 
+ * @since 1.0
+ *
+ */
 public class ServiceMap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceMap.class);
@@ -30,26 +36,37 @@ public class ServiceMap {
     private ServiceMap() {
     }
 
-    public static synchronized void registerServices(String serviceQueueAddress, List<String> servicesNames) {
+    /**
+     * Register the list of services to the provided address
+     * 
+     * @param serviceAddress
+     * @param servicesNames
+     */
+    public static synchronized void registerServices(String serviceAddress, List<String> servicesNames) {
         for (String serviceName : servicesNames) {
             //register service name
             String tmpServiceName = AVAILABLE_SERVICES.get(serviceName);
             if (tmpServiceName==null) {
-                AVAILABLE_SERVICES.put(serviceName, serviceQueueAddress);
-                LOGGER.info("Bound service '{}' to queue address '{}'",
-                        new Object[]{serviceName, serviceQueueAddress});
+                AVAILABLE_SERVICES.put(serviceName, serviceAddress);
+                LOGGER.info("Bound service '{}' to address '{}'",
+                        new Object[] { serviceName, serviceAddress });
             }
-            else if (!serviceQueueAddress.equals(tmpServiceName)) {
-                LOGGER.warn("The service '{}' is already registered with a different queue address (old '{}' - new '{}'). No change will be made",
-                        new Object[]{serviceName, tmpServiceName, serviceQueueAddress});
+            else if (!serviceAddress.equals(tmpServiceName)) {
+                LOGGER.warn("The service '{}' is already registered with a different address (old '{}' - new '{}'). No change will be made",
+                        new Object[] { serviceName, tmpServiceName, serviceAddress });
             }
             else {
-                LOGGER.info("The service '{}' is already registered with queue address '{}'",
-                        new Object[]{serviceName, serviceQueueAddress});
+                LOGGER.info("The service '{}' is already registered with address '{}'",
+                        new Object[] { serviceName, serviceAddress });
             }
         }
     }
 
+    /**
+     * Unregister the provided services from the addess map
+     * 
+     * @param servicesNames
+     */
     public static synchronized void unregisterServices(List<String> servicesNames) {
         if (servicesNames != null) {
             for (String serviceName : servicesNames) {
@@ -57,14 +74,20 @@ public class ServiceMap {
                 if (tmpServiceName == null) {
                     LOGGER.warn("Cannot deregister service '{}'. The service wasn't registered!", serviceName);
                 } else {
-                    LOGGER.info("Deregistered service '{}' from queue address '{}'",
+                    LOGGER.info("Deregistered service '{}' from address '{}'",
                             new Object[] { serviceName, tmpServiceName });
                 }
             }
         }
     }
 
-    public static String getQueueAddress(String serviceName) {
+    /**
+     * Get the address associated to the specific service
+     * 
+     * @param serviceName
+     * @return
+     */
+    public static String getAddress(String serviceName) {
         return AVAILABLE_SERVICES.get(serviceName);
     }
 

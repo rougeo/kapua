@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.eclipse.kapua.commons.event.service.internal;
 
+import org.eclipse.kapua.commons.event.service.api.Event;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventCreator;
 import org.eclipse.kapua.commons.model.AbstractKapuaEntityCreator;
 import org.eclipse.kapua.model.id.KapuaId;
-import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEventCreator;
 
 /**
  * KapuaEvent creator service implementation.
@@ -22,7 +22,7 @@ import org.eclipse.kapua.service.event.KapuaEventCreator;
  * @since 1.0
  * 
  */
-public class KapuaEventCreatorImpl extends AbstractKapuaEntityCreator<KapuaEvent> implements KapuaEventCreator {
+public class KapuaEventCreatorImpl extends AbstractKapuaEntityCreator<Event> implements KapuaEventCreator {
 
     private static final long serialVersionUID = 1048699703033893534L;
 

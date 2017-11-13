@@ -18,6 +18,12 @@ import org.eclipse.kapua.service.event.KapuaEventBusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Event bus manager. It handles the Event bus life cycle
+ * 
+ * @since 1.0
+ *
+ */
 public class EventBusManager {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EventBusManager.class);
@@ -38,6 +44,12 @@ public class EventBusManager {
 
     }
 
+    /**
+     * Get the event bus instance
+     * 
+     * @return
+     * @throws KapuaEventBusException
+     */
     public static KapuaEventBus getInstance() throws KapuaEventBusException {
         if (!started) {
             throw new KapuaEventBusException("The event bus isn't initialized! Cannot perform any operation!");
@@ -45,11 +57,21 @@ public class EventBusManager {
         return JMS_EVENT_BUS;
     }
 
+    /**
+     * Start the event bus
+     * 
+     * @throws KapuaEventBusException
+     */
     public static void start() throws KapuaEventBusException {
         JMS_EVENT_BUS.start();
         started = true;
     }
 
+    /**
+     * Stop the event bus
+     * 
+     * @throws KapuaEventBusException
+     */
     public static void stop() throws KapuaEventBusException {
         JMS_EVENT_BUS.stop();
         started = false;

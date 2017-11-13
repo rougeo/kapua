@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -19,8 +19,8 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.KapuaRuntimeException;
+import org.eclipse.kapua.commons.event.EventScope;
 import org.eclipse.kapua.commons.event.bus.EventBusMarshaler;
-import org.eclipse.kapua.commons.event.service.EventScope;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.commons.setting.system.SystemSetting;
@@ -51,7 +51,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @since 0.3.0
+ * JMS event bus implementation
+ * 
+ * @since 1.0
  */
 public class JMSEventBus implements KapuaEventBus, ExceptionListener {
 
@@ -68,10 +70,21 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
     private EventBusJMSConnectionBridge eventBusJMSConnectionBridge;
     private EventBusMarshaler eventBusMarshaler;
 
+    /**
+     * Default constructor
+     * 
+     * @throws KapuaEventBusException
+     * @throws JMSException
+     */
     public JMSEventBus() throws KapuaEventBusException, JMSException {
         eventBusJMSConnectionBridge = new EventBusJMSConnectionBridge(this);
     }
 
+    /**
+     * Start the event bus
+     * 
+     * @throws KapuaEventBusException
+     */
     public void start() throws KapuaEventBusException {
         try {
             //initialize event bus marshaler
@@ -111,6 +124,11 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
         KapuaSession.createFrom(kapuaEvent.getScopeId(), kapuaEvent.getUserId());
     }
 
+    /**
+     * Stop the event bus
+     * 
+     * @throws KapuaEventBusException
+     */
     public void stop() throws KapuaEventBusException {
         eventBusJMSConnectionBridge.stop();
     }

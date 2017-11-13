@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.event;
+package org.eclipse.kapua.commons.event.service.api;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,6 +27,6 @@ import org.eclipse.kapua.model.query.KapuaListResult;
 @XmlRootElement(name = "kapuaEventListResult")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(factoryClass = KapuaEventStoreXmlRegistry.class,factoryMethod = "newKapuaEventListResult")
-public interface KapuaEventListResult extends KapuaListResult<KapuaEvent> {
+public interface KapuaEventListResult extends KapuaListResult<Event> {
 
 }

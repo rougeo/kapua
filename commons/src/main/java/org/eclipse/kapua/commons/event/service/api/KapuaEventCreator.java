@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,16 +9,10 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.event;
+package org.eclipse.kapua.commons.event.service.api;
 
-import org.eclipse.kapua.model.KapuaEntityFactory;
+import org.eclipse.kapua.model.KapuaEntityCreator;
 
-/**
- * KapuaEvent factory service definition.
- * 
- * @since 1.0
- * 
- */
-public interface KapuaEventStoreFactory extends KapuaEntityFactory<KapuaEvent, KapuaEventCreator, KapuaEventStoreQuery, KapuaEventListResult> {
+public interface KapuaEventCreator extends KapuaEntityCreator<Event> {
 
 }

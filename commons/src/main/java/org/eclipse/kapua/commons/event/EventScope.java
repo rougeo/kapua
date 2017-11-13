@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,16 +9,15 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event.service;
+package org.eclipse.kapua.commons.event;
 
 import java.util.Stack;
 import java.util.UUID;
 
-import org.eclipse.kapua.commons.event.service.internal.KapuaEventImpl;
 import org.eclipse.kapua.service.event.KapuaEvent;
 
 /**
- * Utility class to handle the thread context Kapua event stack.
+ * Utility class to handle the thread context event stack.
  * 
  * @since 1.0
  *
@@ -47,26 +46,26 @@ public class EventScope {
         // Is it the first call in the stack?
         String contextId = null;
         if (!eventStack.empty()) {
-            KapuaEvent lastKapuaEvent = eventStack.peek();
-            contextId = lastKapuaEvent.getContextId();
+            KapuaEvent lastEvent = eventStack.peek();
+            contextId = lastEvent.getContextId();
         } else {
             contextId = UUID.randomUUID().toString();
         }
 
-        KapuaEventImpl newKapuaEvent = new KapuaEventImpl();
-        newKapuaEvent.setContextId(contextId);
-        eventStack.push(newKapuaEvent);
+        KapuaEvent newEvent = new KapuaEvent();
+        newEvent.setContextId(contextId);
+        eventStack.push(newEvent);
         return eventStack.peek();
     }
 
     /**
      * Create a new thread context Kapua event stack and set the Kapua event at the top
      * 
-     * @param kapuaEvent
+     * @param event
      */
-    public static void set(KapuaEvent kapuaEvent) {
+    public static void set(KapuaEvent event) {
         Stack<KapuaEvent> eventStack = new Stack<>();
-        eventStack.push(kapuaEvent);
+        eventStack.push(event);
         eventContextThdLocal.set(eventStack);
     }
 

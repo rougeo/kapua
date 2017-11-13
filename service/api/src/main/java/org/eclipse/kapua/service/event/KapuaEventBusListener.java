@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2016 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,12 +14,16 @@ package org.eclipse.kapua.service.event;
 import org.eclipse.kapua.KapuaException;
 
 /**
- * @since 0.3.0
+ * Event bus listener definition
+ * 
+ * @since 1.0
  */
 public interface KapuaEventBusListener {
 
     /**
-     * This method implementation must be thread safe!
+     * Process the on event business logic<BR>
+     * <B>NOTE: This method implementation must be thread safe!</B>
+     * 
      * @param kapuaEvent
      * @throws KapuaException
      */

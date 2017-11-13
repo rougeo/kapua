@@ -29,7 +29,7 @@ import org.eclipse.kapua.KapuaRuntimeException;
 import org.eclipse.kapua.commons.core.ServiceModule;
 import org.eclipse.kapua.commons.core.ServiceModuleProvider;
 import org.eclipse.kapua.commons.core.ServiceModuleProviderImpl;
-import org.eclipse.kapua.commons.event.service.InterceptorBind;
+import org.eclipse.kapua.commons.event.InterceptorBind;
 import org.eclipse.kapua.commons.util.ResourceUtils;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.KapuaObjectFactory;

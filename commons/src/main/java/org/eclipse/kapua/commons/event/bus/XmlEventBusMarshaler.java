@@ -19,6 +19,12 @@ import org.eclipse.kapua.commons.util.xml.XmlUtil;
 import org.eclipse.kapua.service.event.KapuaEvent;
 import org.eclipse.kapua.service.event.KapuaEventBusException;
 
+/**
+ * Xml event bus marshaller implementation
+ * 
+ * @since 1.0
+ * 
+ */
 public class XmlEventBusMarshaler extends EventBusMarshaler {
 
     @Override

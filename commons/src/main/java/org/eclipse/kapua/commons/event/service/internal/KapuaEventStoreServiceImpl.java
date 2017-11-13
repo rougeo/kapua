@@ -15,6 +15,10 @@ import javax.inject.Inject;
 
 import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaException;
+import org.eclipse.kapua.commons.event.service.api.Event;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventCreator;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventListResult;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreService;
 import org.eclipse.kapua.commons.jpa.EntityManagerFactory;
 import org.eclipse.kapua.commons.service.internal.AbstractKapuaService;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
@@ -25,10 +29,6 @@ import org.eclipse.kapua.service.authorization.AuthorizationService;
 import org.eclipse.kapua.service.authorization.domain.Domain;
 import org.eclipse.kapua.service.authorization.permission.Actions;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
-import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEventCreator;
-import org.eclipse.kapua.service.event.KapuaEventListResult;
-import org.eclipse.kapua.service.event.KapuaEventStoreService;
 import org.eclipse.kapua.service.event.RaiseKapuaEvent;
 
 /**
@@ -55,7 +55,7 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
 
     @Override
     @RaiseKapuaEvent
-    public KapuaEvent create(KapuaEventCreator kapuaEventCreator)
+    public Event create(KapuaEventCreator kapuaEventCreator)
             throws KapuaException {
 
         throw new UnsupportedOperationException();
@@ -63,7 +63,7 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
 
     @Override
     @RaiseKapuaEvent
-    public KapuaEvent update(KapuaEvent kapuaEvent)
+    public Event update(Event kapuaEvent)
             throws KapuaException {
         //
         // Validation of the fields
@@ -76,9 +76,9 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
         //
         // Do update
         return entityManagerSession.onTransactedResult(em -> {
-            KapuaEvent oldKapuaEvent = KapuaEventStoreDAO.find(em, kapuaEvent.getId());
+            Event oldKapuaEvent = KapuaEventStoreDAO.find(em, kapuaEvent.getId());
             if (oldKapuaEvent == null) {
-                throw new KapuaEntityNotFoundException(KapuaEvent.TYPE, kapuaEvent.getId());
+                throw new KapuaEntityNotFoundException(Event.TYPE, kapuaEvent.getId());
             }
 
             // Update
@@ -109,7 +109,7 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
     }
 
     @Override
-    public KapuaEvent find(KapuaId scopeId, KapuaId kapuaEventId)
+    public Event find(KapuaId scopeId, KapuaId kapuaEventId)
             throws KapuaException {
         //
         // Validation of the fields
@@ -126,7 +126,7 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
     }
 
     @Override
-    public KapuaEvent find(KapuaId kapuaEventId)
+    public Event find(KapuaId kapuaEventId)
             throws KapuaException {
         //
         // Validation of the fields
@@ -142,7 +142,7 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
     }
 
     @Override
-    public KapuaEventListResult query(KapuaQuery<KapuaEvent> query)
+    public KapuaEventListResult query(KapuaQuery<Event> query)
             throws KapuaException {
         ArgumentValidator.notNull(query, "query");
 
@@ -154,7 +154,7 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
     }
 
     @Override
-    public long count(KapuaQuery<KapuaEvent> query)
+    public long count(KapuaQuery<Event> query)
             throws KapuaException {
         ArgumentValidator.notNull(query, "query");
         ArgumentValidator.notNull(query.getScopeId(), "query.scopeId");
@@ -167,7 +167,7 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
     }
 
     /**
-     * Find an {@link KapuaEvent} without authorization checks.
+     * Find an {@link Event} without authorization checks.
      *
      * @param kapuaEventId
      * @return
@@ -175,7 +175,7 @@ public class KapuaEventStoreServiceImpl extends AbstractKapuaService implements 
      * 
      * @since 1.0.0
      */
-    private KapuaEvent findById(KapuaId kapuaEventId)
+    private Event findById(KapuaId kapuaEventId)
             throws KapuaException {
         //
         // Argument Validation

@@ -13,6 +13,10 @@ package org.eclipse.kapua.app.console;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.configuration.metatype.TscalarImpl;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventCreator;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventListResult;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreQuery;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreXmlRegistry;
 import org.eclipse.kapua.commons.util.xml.JAXBContextProvider;
 import org.eclipse.kapua.model.config.metatype.KapuaTad;
 import org.eclipse.kapua.model.config.metatype.KapuaTicon;
@@ -42,10 +46,6 @@ import org.eclipse.kapua.service.device.management.packages.model.install.Device
 import org.eclipse.kapua.service.device.management.packages.model.uninstall.DevicePackageUninstallRequest;
 import org.eclipse.kapua.service.device.management.snapshot.DeviceSnapshots;
 import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEventCreator;
-import org.eclipse.kapua.service.event.KapuaEventListResult;
-import org.eclipse.kapua.service.event.KapuaEventStoreQuery;
-import org.eclipse.kapua.service.event.KapuaEventStoreXmlRegistry;
 import org.eclipse.persistence.jaxb.JAXBContextFactory;
 
 import javax.xml.bind.JAXBContext;

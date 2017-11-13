@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.event;
+package org.eclipse.kapua.commons.event.service.api;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.model.id.KapuaId;
@@ -25,8 +25,8 @@ import org.eclipse.kapua.service.KapuaUpdatableEntityService;
  * @since 1.0
  * 
  */
-public interface KapuaEventStoreService extends KapuaEntityService<KapuaEvent, KapuaEventCreator>,
-        KapuaUpdatableEntityService<KapuaEvent> {
+public interface KapuaEventStoreService extends KapuaEntityService<Event, KapuaEventCreator>,
+        KapuaUpdatableEntityService<Event> {
 
     /**
      * Finds the kapuaEvent by kapuaEvent identifiers
@@ -35,7 +35,7 @@ public interface KapuaEventStoreService extends KapuaEntityService<KapuaEvent, K
      * @return
      * @throws KapuaException
      */
-    public KapuaEvent find(KapuaId id)
+    public Event find(KapuaId id)
             throws KapuaException;
 
     /**
@@ -47,7 +47,7 @@ public interface KapuaEventStoreService extends KapuaEntityService<KapuaEvent, K
      * @throws KapuaException
      * @since 1.0.0
      */
-    public KapuaEventListResult query(KapuaQuery<KapuaEvent> query)
+    public KapuaEventListResult query(KapuaQuery<Event> query)
             throws KapuaException;
 
 }

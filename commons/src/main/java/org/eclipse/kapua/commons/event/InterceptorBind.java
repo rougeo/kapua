@@ -9,26 +9,18 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.event;
+package org.eclipse.kapua.commons.event;
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.ElementType;
+@Retention(RetentionPolicy.RUNTIME) 
+@Target(ElementType.TYPE)
+public @interface InterceptorBind {
 
-/**
- * Raise event definition
- * 
- * @since 1.0
- *
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface RaiseKapuaEvent {
-
-    String service() default "";
-    String entityType() default "";
-    String operation() default "";
-    String note() default "";
+    Class<?> matchSubclassOf() ;
+    Class<? extends Annotation> matchAnnotatedWith();
 }

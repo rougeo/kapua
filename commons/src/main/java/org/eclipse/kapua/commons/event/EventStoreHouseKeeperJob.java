@@ -9,18 +9,20 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event.service;
+package org.eclipse.kapua.commons.event;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.kapua.service.event.KapuaEventBus;
-import org.eclipse.kapua.service.event.KapuaEventBusException;
-
 import org.eclipse.kapua.KapuaException;
-import org.eclipse.kapua.commons.event.service.internal.KapuaEventHousekeeper;
+import org.eclipse.kapua.commons.event.service.api.Event;
+import org.eclipse.kapua.commons.event.service.api.EventUtil;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventListResult;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventStorePredicates;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreQuery;
+import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreService;
 import org.eclipse.kapua.commons.event.service.internal.KapuaEventStoreFactoryImpl;
 import org.eclipse.kapua.commons.event.service.internal.KapuaEventStoreServiceImpl;
 import org.eclipse.kapua.commons.jpa.EntityManager;
@@ -32,15 +34,18 @@ import org.eclipse.kapua.commons.setting.system.SystemSetting;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
 import org.eclipse.kapua.commons.util.KapuaDateUtils;
 import org.eclipse.kapua.model.query.predicate.KapuaAttributePredicate.Operator;
-import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEventListResult;
-import org.eclipse.kapua.service.event.KapuaEventStorePredicates;
-import org.eclipse.kapua.service.event.KapuaEventStoreQuery;
-import org.eclipse.kapua.service.event.KapuaEventStoreService;
+import org.eclipse.kapua.service.event.KapuaEventBus;
+import org.eclipse.kapua.service.event.KapuaEventBusException;
 import org.eclipse.kapua.service.event.KapuaEvent.EventStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Event bus housekeeper. It is responsible to send unsent messages or send again messages gone in error.
+ * 
+ * @since 1.0
+ *
+ */
 public class EventStoreHouseKeeperJob implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventStoreHouseKeeperJob.class);
@@ -65,6 +70,15 @@ public class EventStoreHouseKeeperJob implements Runnable {
     private String[] servicesNames;
     private boolean running;
 
+    /**
+     * Default constructor
+     * 
+     * @param entityManagerFactory
+     * @param eventbus
+     * @param serviceInternalEventAddress
+     * @param servicesNameList
+     * @throws KapuaException
+     */
     public EventStoreHouseKeeperJob(EntityManagerFactory entityManagerFactory, KapuaEventBus eventbus, String serviceInternalEventAddress, List<String> servicesNameList) throws KapuaException {
         this.eventbus = eventbus;
         this.serviceInternalEventAddress = serviceInternalEventAddress;
@@ -130,10 +144,10 @@ public class EventStoreHouseKeeperJob implements Runnable {
         KapuaEventListResult unsentMessagesList = getUnsentEvents(serviceName, eventsProcessType);
         //send unprocessed events
         if (!unsentMessagesList.isEmpty()) {
-            for (KapuaEvent kapuaEvent : unsentMessagesList.getItems()) {
+            for (Event kapuaEvent : unsentMessagesList.getItems()) {
                 try {
                     LOGGER.info("publish event: service '{}' - operation '{}' - id '{}'", new Object[]{kapuaEvent.getService(), kapuaEvent.getOperation(), kapuaEvent.getContextId()});
-                    eventbus.publish(serviceInternalEventAddress, kapuaEvent);
+                    eventbus.publish(serviceInternalEventAddress, EventUtil.toServiceEventBus(kapuaEvent));
                     //if message was sent successfully then confirm the event in the event table
                     //if something goes wrong during this update the event message may be raised twice (but this condition should happens rarely and it is compliant to the contract of the service events)
                     //this is done in a different transaction

@@ -23,12 +23,24 @@ import org.eclipse.kapua.service.event.KapuaEvent;
 import org.eclipse.kapua.service.event.KapuaEventBusException;
 import org.xml.sax.SAXException;
 
+/**
+ * Event bus marshaler. It allows custom marshaling/unmarshaling of the service bus event object.
+ *
+ * @since 1.0
+ */
 public abstract class EventBusMarshaler {
 
     public final static String CONTENT_TYPE_KEY = "ContentType";
     public final static String CONTENT_TYPE_JSON = "application/json";
     public final static String CONTENT_TYPE_XML = "application/xml";
 
+    /**
+     * Unmarshal the message received from the bus
+     * 
+     * @param textMessage
+     * @return
+     * @throws KapuaException
+     */
     public KapuaEvent unmarshal(TextMessage textMessage) throws KapuaException {
         try {
             String contentType = textMessage.getStringProperty(CONTENT_TYPE_KEY);
@@ -46,6 +58,13 @@ public abstract class EventBusMarshaler {
         }
     }
 
+    /**
+     * Marshal the message to the service event bus
+     * 
+     * @param textMessage
+     * @param kapuaEvent
+     * @throws KapuaException
+     */
     public abstract void marshal(TextMessage textMessage, KapuaEvent kapuaEvent) throws KapuaException;
 
 }
