@@ -16,7 +16,7 @@ package org.eclipse.kapua.service.event;
  * 
  * @since 1.0
  */
-public interface KapuaEventBus {
+public interface ServiceEventBus {
 
     /**
      * Publish the event to the bus
@@ -25,9 +25,9 @@ public interface KapuaEventBus {
      *            address in which to publish the event
      * @param event
      *            event to publish
-     * @throws KapuaEventBusException
+     * @throws ServiceEventBusException
      */
-    public void publish(String address, KapuaEvent event) throws KapuaEventBusException;
+    public void publish(String address, ServiceEvent event) throws ServiceEventBusException;
 
     /**
      * Subscribe for a specific address event
@@ -38,7 +38,7 @@ public interface KapuaEventBus {
      *            subscriber name. It's used to share events between multiple instances of the same consumer.
      * @param eventListener
      *            listener to invoke when an event is received
-     * @throws KapuaEventBusException
+     * @throws ServiceEventBusException
      */
-    public void subscribe(String address, String name, KapuaEventBusListener eventListener) throws KapuaEventBusException;
+    public void subscribe(String address, String name, ServiceEventBusListener eventListener) throws ServiceEventBusException;
 }

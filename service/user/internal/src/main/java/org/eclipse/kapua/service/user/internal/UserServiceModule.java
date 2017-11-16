@@ -21,11 +21,11 @@ import javax.inject.Inject;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.core.ServiceModule;
-import org.eclipse.kapua.commons.event.EventStoreHouseKeeperJob;
+import org.eclipse.kapua.commons.event.ServiceEventStoreHouseKeeperJob;
 import org.eclipse.kapua.commons.event.ServiceMap;
-import org.eclipse.kapua.commons.event.bus.EventBusManager;
+import org.eclipse.kapua.commons.event.bus.ServiceEventBusManager;
 import org.eclipse.kapua.locator.KapuaProvider;
-import org.eclipse.kapua.service.event.KapuaEventBus;
+import org.eclipse.kapua.service.event.ServiceEventBus;
 import org.eclipse.kapua.service.user.UserService;
 import org.eclipse.kapua.service.user.internal.setting.KapuaUserSetting;
 import org.eclipse.kapua.service.user.internal.setting.KapuaUserSettingKeys;
@@ -47,12 +47,12 @@ public class UserServiceModule implements ServiceModule {
     private List<String> servicesNames;
     private ScheduledExecutorService houseKeeperScheduler;
     private ScheduledFuture<?> houseKeeperHandler;
-    private EventStoreHouseKeeperJob houseKeeperJob;
+    private ServiceEventStoreHouseKeeperJob houseKeeperJob;
 
     @Override
     public void start() throws KapuaException {
 
-        KapuaEventBus eventbus = EventBusManager.getInstance();
+        ServiceEventBus eventbus = ServiceEventBusManager.getInstance();
 
         // Listen to upstream service events
         eventbus.subscribe("account", "account-user", userService);
@@ -64,7 +64,7 @@ public class UserServiceModule implements ServiceModule {
 
         // Start the House keeper
         houseKeeperScheduler = Executors.newScheduledThreadPool(1);
-        houseKeeperJob = new EventStoreHouseKeeperJob(UserEntityManagerFactory.getInstance(), eventbus, serviceInternalEventAddress, servicesNames);
+        houseKeeperJob = new ServiceEventStoreHouseKeeperJob(UserEntityManagerFactory.getInstance(), eventbus, serviceInternalEventAddress, servicesNames);
         // Start time can be made random from 0 to 30 seconds
         houseKeeperHandler = houseKeeperScheduler.scheduleAtFixedRate(houseKeeperJob, SCHEDULED_EXECUTION_TIME_WINDOW, SCHEDULED_EXECUTION_TIME_WINDOW, TimeUnit.SECONDS);
     }

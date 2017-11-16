@@ -13,16 +13,16 @@ package org.eclipse.kapua.commons.event.service.internal;
 
 import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaException;
-import org.eclipse.kapua.commons.event.service.api.Event;
-import org.eclipse.kapua.commons.event.service.api.KapuaEventListResult;
+import org.eclipse.kapua.commons.event.service.api.ServiceEvent;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventListResult;
 import org.eclipse.kapua.commons.jpa.EntityManager;
 import org.eclipse.kapua.commons.service.internal.ServiceDAO;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
 
-public class KapuaEventStoreDAO {
+public class ServiceEventStoreDAO {
 
-    private KapuaEventStoreDAO() {
+    private ServiceEventStoreDAO() {
     }
 
     /**
@@ -33,7 +33,7 @@ public class KapuaEventStoreDAO {
      * @return
      * @throws KapuaException
      */
-    public static Event create(EntityManager em, Event kapuaEvent)
+    public static ServiceEvent create(EntityManager em, ServiceEvent kapuaEvent)
             throws KapuaException {
         return ServiceDAO.create(em, kapuaEvent);
     }
@@ -46,12 +46,12 @@ public class KapuaEventStoreDAO {
      * @return
      * @throws KapuaException
      */
-    public static Event update(EntityManager em, Event kapuaEvent)
+    public static ServiceEvent update(EntityManager em, ServiceEvent kapuaEvent)
             throws KapuaException {
 
-        KapuaEventImpl kapuaEventImpl = (KapuaEventImpl) kapuaEvent;
+        ServiceEventImpl kapuaEventImpl = (ServiceEventImpl) kapuaEvent;
 
-        return ServiceDAO.update(em, KapuaEventImpl.class, kapuaEventImpl);
+        return ServiceDAO.update(em, ServiceEventImpl.class, kapuaEventImpl);
     }
 
     /**
@@ -62,14 +62,14 @@ public class KapuaEventStoreDAO {
      * @throws KapuaEntityNotFoundException
      */
     public static void delete(EntityManager em, KapuaId eventId) throws KapuaEntityNotFoundException {
-        ServiceDAO.delete(em, KapuaEventImpl.class, eventId);
+        ServiceDAO.delete(em, ServiceEventImpl.class, eventId);
     }
 
     /**
      * Finds the event by event identifier
      */
-    public static Event find(EntityManager em, KapuaId eventId) {
-        return em.find(KapuaEventImpl.class, eventId);
+    public static ServiceEvent find(EntityManager em, KapuaId eventId) {
+        return em.find(ServiceEventImpl.class, eventId);
     }
 
     /**
@@ -80,9 +80,9 @@ public class KapuaEventStoreDAO {
      * @return
      * @throws KapuaException
      */
-    public static KapuaEventListResult query(EntityManager em, KapuaQuery<Event> kapuaEventQuery)
+    public static ServiceEventListResult query(EntityManager em, KapuaQuery<ServiceEvent> kapuaEventQuery)
             throws KapuaException {
-        return ServiceDAO.query(em, Event.class, KapuaEventImpl.class, new KapuaEventListResultImpl(), kapuaEventQuery);
+        return ServiceDAO.query(em, ServiceEvent.class, ServiceEventImpl.class, new ServiceEventListResultImpl(), kapuaEventQuery);
     }
 
     /**
@@ -93,8 +93,8 @@ public class KapuaEventStoreDAO {
      * @return
      * @throws KapuaException
      */
-    public static long count(EntityManager em, KapuaQuery<Event> kapuaEventQuery)
+    public static long count(EntityManager em, KapuaQuery<ServiceEvent> kapuaEventQuery)
             throws KapuaException {
-        return ServiceDAO.count(em, Event.class, KapuaEventImpl.class, kapuaEventQuery);
+        return ServiceDAO.count(em, ServiceEvent.class, ServiceEventImpl.class, kapuaEventQuery);
     }
 }

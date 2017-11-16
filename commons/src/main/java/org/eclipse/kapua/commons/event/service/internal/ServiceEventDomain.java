@@ -28,7 +28,7 @@ import com.google.common.collect.Lists;
  * @since 1.0
  *
  */
-public class KapuaEventDomain extends AbstractKapuaEntity implements Domain {
+public class ServiceEventDomain extends AbstractKapuaEntity implements Domain {
 
     private static final long serialVersionUID = 2624648055164592528L;
 

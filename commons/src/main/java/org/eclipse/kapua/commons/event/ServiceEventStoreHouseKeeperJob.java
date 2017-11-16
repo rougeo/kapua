@@ -17,14 +17,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.kapua.KapuaException;
-import org.eclipse.kapua.commons.event.service.api.Event;
-import org.eclipse.kapua.commons.event.service.api.EventUtil;
-import org.eclipse.kapua.commons.event.service.api.KapuaEventListResult;
-import org.eclipse.kapua.commons.event.service.api.KapuaEventStorePredicates;
-import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreQuery;
-import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreService;
-import org.eclipse.kapua.commons.event.service.internal.KapuaEventStoreFactoryImpl;
-import org.eclipse.kapua.commons.event.service.internal.KapuaEventStoreServiceImpl;
+import org.eclipse.kapua.commons.event.service.api.ServiceEvent;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventUtil;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventListResult;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventStorePredicates;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventStoreQuery;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventStoreService;
+import org.eclipse.kapua.commons.event.service.internal.ServiceEventStoreFactoryImpl;
+import org.eclipse.kapua.commons.event.service.internal.ServiceEventStoreServiceImpl;
 import org.eclipse.kapua.commons.jpa.EntityManager;
 import org.eclipse.kapua.commons.jpa.EntityManagerFactory;
 import org.eclipse.kapua.commons.model.query.predicate.AndPredicate;
@@ -34,9 +34,9 @@ import org.eclipse.kapua.commons.setting.system.SystemSetting;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
 import org.eclipse.kapua.commons.util.KapuaDateUtils;
 import org.eclipse.kapua.model.query.predicate.KapuaAttributePredicate.Operator;
-import org.eclipse.kapua.service.event.KapuaEventBus;
-import org.eclipse.kapua.service.event.KapuaEventBusException;
-import org.eclipse.kapua.service.event.KapuaEvent.EventStatus;
+import org.eclipse.kapua.service.event.ServiceEventBus;
+import org.eclipse.kapua.service.event.ServiceEventBusException;
+import org.eclipse.kapua.service.event.ServiceEvent.EventStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +46,9 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  *
  */
-public class EventStoreHouseKeeperJob implements Runnable {
+public class ServiceEventStoreHouseKeeperJob implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventStoreHouseKeeperJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceEventStoreHouseKeeperJob.class);
 
     private enum EventsProcessType {
         OLD,
@@ -61,11 +61,11 @@ public class EventStoreHouseKeeperJob implements Runnable {
 
     private final Object monitor = new Object();
 
-    private KapuaEventStoreService kapuaEventService;
+    private ServiceEventStoreService kapuaEventService;
 
     private EntityManager manager;
 
-    private KapuaEventBus eventbus;
+    private ServiceEventBus eventbus;
     private String serviceInternalEventAddress;
     private String[] servicesNames;
     private boolean running;
@@ -79,13 +79,13 @@ public class EventStoreHouseKeeperJob implements Runnable {
      * @param servicesNameList
      * @throws KapuaException
      */
-    public EventStoreHouseKeeperJob(EntityManagerFactory entityManagerFactory, KapuaEventBus eventbus, String serviceInternalEventAddress, List<String> servicesNameList) throws KapuaException {
+    public ServiceEventStoreHouseKeeperJob(EntityManagerFactory entityManagerFactory, ServiceEventBus eventbus, String serviceInternalEventAddress, List<String> servicesNameList) throws KapuaException {
         this.eventbus = eventbus;
         this.serviceInternalEventAddress = serviceInternalEventAddress;
         servicesNames = new String[0];
         servicesNames = servicesNameList.toArray(servicesNames);
         manager = entityManagerFactory.createEntityManager();
-        kapuaEventService = new KapuaEventStoreServiceImpl(entityManagerFactory);
+        kapuaEventService = new ServiceEventStoreServiceImpl(entityManagerFactory);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class EventStoreHouseKeeperJob implements Runnable {
             LOGGER.trace("Scan not processed events for service '{}'", serviceName);
             Date startRun = Date.from(KapuaDateUtils.getKapuaSysDate());
             //try to acquire lock
-            KapuaEventHousekeeper kapuaEventHousekeeper = getLock(serviceName);
+            ServiceEventHousekeeper kapuaEventHousekeeper = getLock(serviceName);
             //scan unsent events (marked as SENT_ERROR)
             findAndSendUnsentEvents(serviceName, EventsProcessType.SEND_ERROR);
             //scan unsent OLD events (marked as FIRED but raised before a specific (configurable) time window)
@@ -141,19 +141,19 @@ public class EventStoreHouseKeeperJob implements Runnable {
     }
 
     private void findAndSendUnsentEvents(String serviceName, EventsProcessType eventsProcessType) throws KapuaException {
-        KapuaEventListResult unsentMessagesList = getUnsentEvents(serviceName, eventsProcessType);
+        ServiceEventListResult unsentMessagesList = getUnsentEvents(serviceName, eventsProcessType);
         //send unprocessed events
         if (!unsentMessagesList.isEmpty()) {
-            for (Event kapuaEvent : unsentMessagesList.getItems()) {
+            for (ServiceEvent kapuaEvent : unsentMessagesList.getItems()) {
                 try {
                     LOGGER.info("publish event: service '{}' - operation '{}' - id '{}'", new Object[]{kapuaEvent.getService(), kapuaEvent.getOperation(), kapuaEvent.getContextId()});
-                    eventbus.publish(serviceInternalEventAddress, EventUtil.toServiceEventBus(kapuaEvent));
+                    eventbus.publish(serviceInternalEventAddress, ServiceEventUtil.toServiceEventBus(kapuaEvent));
                     //if message was sent successfully then confirm the event in the event table
                     //if something goes wrong during this update the event message may be raised twice (but this condition should happens rarely and it is compliant to the contract of the service events)
                     //this is done in a different transaction
                     kapuaEvent.setStatus(EventStatus.SENT);
                     kapuaEventService.update(kapuaEvent);
-                } catch (KapuaEventBusException e) {
+                } catch (ServiceEventBusException e) {
                     LOGGER.warn("Exception publishing event: {}", e.getMessage(), e);
                 } catch (KapuaException e) {
                   //this may be a valid condition if the HouseKeeper is doing the update concurrently with this task
@@ -163,21 +163,21 @@ public class EventStoreHouseKeeperJob implements Runnable {
         }
     }
 
-    private KapuaEventListResult getUnsentEvents(String serviceName, EventsProcessType eventsProcessType) throws KapuaException {
-        KapuaEventStoreQuery query = new KapuaEventStoreFactoryImpl().newQuery(null);
+    private ServiceEventListResult getUnsentEvents(String serviceName, EventsProcessType eventsProcessType) throws KapuaException {
+        ServiceEventStoreQuery query = new ServiceEventStoreFactoryImpl().newQuery(null);
         AndPredicate andPredicate = new AndPredicate();
-        andPredicate.and(new AttributePredicate<>(KapuaEventStorePredicates.SERVICE_NAME, serviceName));
+        andPredicate.and(new AttributePredicate<>(ServiceEventStorePredicates.SERVICE_NAME, serviceName));
         if (EventsProcessType.SEND_ERROR.equals(eventsProcessType)) {
             LOGGER.trace("Looking for SENT_ERROR events. Add EventStatus=SENT_ERROR query predicate.");
-            andPredicate.and(new AttributePredicate<>(KapuaEventStorePredicates.EVENT_STATUS, EventStatus.SEND_ERROR));
+            andPredicate.and(new AttributePredicate<>(ServiceEventStorePredicates.EVENT_STATUS, EventStatus.SEND_ERROR));
         }
         else {
             LOGGER.trace("Looking for OLD events. Add EventStatus=RAISED query predicate.");
-            andPredicate.and(new AttributePredicate<>(KapuaEventStorePredicates.EVENT_STATUS, EventStatus.TRIGGERED));
+            andPredicate.and(new AttributePredicate<>(ServiceEventStorePredicates.EVENT_STATUS, EventStatus.TRIGGERED));
             //add timestamp predicate
             Date eventDateBound = Date.from(KapuaDateUtils.getKapuaSysDate().minusMillis(OLD_MESSAGES_TIME_WINDOW));
             LOGGER.trace("Looking for OLD events. Add timestamp condition query predicate. Date before {}", eventDateBound);
-            andPredicate.and(new AttributePredicate<>(KapuaEventStorePredicates.MODIFIED_ON, eventDateBound, Operator.LESS_THAN_OR_EQUAL));
+            andPredicate.and(new AttributePredicate<>(ServiceEventStorePredicates.MODIFIED_ON, eventDateBound, Operator.LESS_THAN_OR_EQUAL));
         }
         query.setPredicate(andPredicate);
         query.setLimit(EVENT_SCAN_WINDOW);
@@ -201,11 +201,11 @@ public class EventStoreHouseKeeperJob implements Runnable {
         }
     }
 
-    private KapuaEventHousekeeper getLock(String serviceName) throws LockException, NoExecutionNeededException {
-        KapuaEventHousekeeper kapuaEventHousekeeper = null;
+    private ServiceEventHousekeeper getLock(String serviceName) throws LockException, NoExecutionNeededException {
+        ServiceEventHousekeeper kapuaEventHousekeeper = null;
         try {
             manager.beginTransaction();
-            kapuaEventHousekeeper = manager.findWithLock(KapuaEventHousekeeper.class, serviceName);
+            kapuaEventHousekeeper = manager.findWithLock(ServiceEventHousekeeper.class, serviceName);
         }
         catch (Exception e) {
             throw new LockException(String.format("Cannot acquire lock: %s", e.getMessage()), e);
@@ -217,7 +217,7 @@ public class EventStoreHouseKeeperJob implements Runnable {
         return kapuaEventHousekeeper;
     }
 
-    private void updateLock(KapuaEventHousekeeper kapuaEventHousekeeper, String serviceName, Date startRun) throws KapuaException {
+    private void updateLock(ServiceEventHousekeeper kapuaEventHousekeeper, String serviceName, Date startRun) throws KapuaException {
         kapuaEventHousekeeper.setLastRunBy(serviceName);
         kapuaEventHousekeeper.setLastRunOn(startRun);
         manager.persist(kapuaEventHousekeeper);

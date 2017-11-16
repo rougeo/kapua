@@ -25,8 +25,8 @@ import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.id.KapuaIdAdapter;
 import org.eclipse.kapua.model.xml.DateXmlAdapter;
 
-@XmlRootElement(name = "event")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlRootElement(name = "serviceEvent")
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { "id",
         "contextId",
         "timestamp",
@@ -47,7 +47,7 @@ import org.eclipse.kapua.model.xml.DateXmlAdapter;
  * @since 1.0
  *
  */
-public class KapuaEvent implements Serializable {
+public class ServiceEvent implements Serializable {
 
     private static final long serialVersionUID = -6642016486673574115L;
 

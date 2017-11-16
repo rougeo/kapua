@@ -9,13 +9,18 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event.service.api;
+package org.eclipse.kapua.commons.event.service.internal;
 
-import org.eclipse.kapua.model.KapuaUpdatableEntityPredicates;
+import org.eclipse.kapua.commons.event.service.api.ServiceEvent;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventListResult;
+import org.eclipse.kapua.commons.model.query.KapuaListResultImpl;
 
-public interface KapuaEventStorePredicates extends KapuaUpdatableEntityPredicates {
+/**
+ * KapuaEvent list result implementation.
+ *
+ * @since 1.0
+ */
+public class ServiceEventListResultImpl extends KapuaListResultImpl<ServiceEvent> implements ServiceEventListResult {
 
-    public static final String EVENT_STATUS = "status";
-    public static final String SERVICE_NAME = "service";
-
+    private static final long serialVersionUID = -5118004898345748297L;
 }

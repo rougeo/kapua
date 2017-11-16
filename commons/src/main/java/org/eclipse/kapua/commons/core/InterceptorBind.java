@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event;
+package org.eclipse.kapua.commons.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;

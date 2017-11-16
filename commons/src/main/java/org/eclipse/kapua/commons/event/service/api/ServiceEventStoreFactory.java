@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2017 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,23 +9,16 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.event;
+package org.eclipse.kapua.commons.event.service.api;
 
-import org.eclipse.kapua.KapuaException;
+import org.eclipse.kapua.model.KapuaEntityFactory;
 
 /**
- * Event bus listener definition
+ * KapuaEvent factory service definition.
  * 
  * @since 1.0
+ * 
  */
-public interface KapuaEventBusListener {
+public interface ServiceEventStoreFactory extends KapuaEntityFactory<ServiceEvent, ServiceEventCreator, ServiceEventStoreQuery, ServiceEventListResult> {
 
-    /**
-     * Process the on event business logic<BR>
-     * <B>NOTE: This method implementation must be thread safe!</B>
-     * 
-     * @param kapuaEvent
-     * @throws KapuaException
-     */
-    public void onKapuaEvent(KapuaEvent kapuaEvent) throws KapuaException;
 }

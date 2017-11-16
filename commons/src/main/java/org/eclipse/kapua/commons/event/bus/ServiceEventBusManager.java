@@ -12,47 +12,46 @@
 package org.eclipse.kapua.commons.event.bus;
 
 import org.eclipse.kapua.KapuaRuntimeException;
-import org.eclipse.kapua.commons.event.bus.jms.JMSEventBus;
-import org.eclipse.kapua.service.event.KapuaEventBus;
-import org.eclipse.kapua.service.event.KapuaEventBusException;
+import org.eclipse.kapua.commons.event.bus.jms.JMSServiceEventBus;
+import org.eclipse.kapua.service.event.ServiceEventBus;
+import org.eclipse.kapua.service.event.ServiceEventBusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Event bus manager. It handles the Event bus life cycle
+ * Service event bus manager. It handles the service event bus life cycle
  * 
  * @since 1.0
  *
  */
-public class EventBusManager {
+public class ServiceEventBusManager {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(EventBusManager.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ServiceEventBusManager.class);
 
-    private final static JMSEventBus JMS_EVENT_BUS;
+    private final static JMSServiceEventBus JMS_EVENT_BUS;
     private static boolean started;
 
     static {
         try {
-            JMS_EVENT_BUS = new JMSEventBus();
+            JMS_EVENT_BUS = new JMSServiceEventBus();
         } catch (Throwable t) {
             LOGGER.error("Error while initializing EventbusProvider", t);
             throw KapuaRuntimeException.internalError(t, "Cannot initialize event bus manager");
         }
     }
 
-    private EventBusManager() {
-
+    private ServiceEventBusManager() {
     }
 
     /**
      * Get the event bus instance
      * 
      * @return
-     * @throws KapuaEventBusException
+     * @throws ServiceEventBusException
      */
-    public static KapuaEventBus getInstance() throws KapuaEventBusException {
+    public static ServiceEventBus getInstance() throws ServiceEventBusException {
         if (!started) {
-            throw new KapuaEventBusException("The event bus isn't initialized! Cannot perform any operation!");
+            throw new ServiceEventBusException("The event bus isn't initialized! Cannot perform any operation!");
         }
         return JMS_EVENT_BUS;
     }
@@ -60,9 +59,9 @@ public class EventBusManager {
     /**
      * Start the event bus
      * 
-     * @throws KapuaEventBusException
+     * @throws ServiceEventBusException
      */
-    public static void start() throws KapuaEventBusException {
+    public static void start() throws ServiceEventBusException {
         JMS_EVENT_BUS.start();
         started = true;
     }
@@ -70,9 +69,9 @@ public class EventBusManager {
     /**
      * Stop the event bus
      * 
-     * @throws KapuaEventBusException
+     * @throws ServiceEventBusException
      */
-    public static void stop() throws KapuaEventBusException {
+    public static void stop() throws ServiceEventBusException {
         JMS_EVENT_BUS.stop();
         started = false;
     }

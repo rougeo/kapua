@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event.bus;
+package org.eclipse.kapua.commons.event;
 
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
@@ -19,8 +19,8 @@ import javax.xml.stream.XMLStreamException;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.util.xml.XmlUtil;
-import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEventBusException;
+import org.eclipse.kapua.service.event.ServiceEvent;
+import org.eclipse.kapua.service.event.ServiceEventBusException;
 import org.xml.sax.SAXException;
 
 /**
@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  *
  * @since 1.0
  */
-public abstract class EventBusMarshaler {
+public abstract class ServiceEventMarshaler {
 
     public final static String CONTENT_TYPE_KEY = "ContentType";
     public final static String CONTENT_TYPE_JSON = "application/json";
@@ -41,20 +41,20 @@ public abstract class EventBusMarshaler {
      * @return
      * @throws KapuaException
      */
-    public KapuaEvent unmarshal(TextMessage textMessage) throws KapuaException {
+    public ServiceEvent unmarshal(TextMessage textMessage) throws KapuaException {
         try {
             String contentType = textMessage.getStringProperty(CONTENT_TYPE_KEY);
             if (CONTENT_TYPE_XML.equals(contentType)) {
-                return XmlUtil.unmarshal(textMessage.getText(), KapuaEvent.class);
+                return XmlUtil.unmarshal(textMessage.getText(), ServiceEvent.class);
             }
             else if (CONTENT_TYPE_JSON.equals(contentType)) {
-                return XmlUtil.unmarshalJson(textMessage.getText(), KapuaEvent.class, null);
+                return XmlUtil.unmarshalJson(textMessage.getText(), ServiceEvent.class, null);
             }
             else {
-                throw new KapuaEventBusException(String.format("Unsupported content type '{}'", contentType));
+                throw new ServiceEventBusException(String.format("Unsupported content type '{}'", contentType));
             }
         } catch (JAXBException | XMLStreamException | FactoryConfigurationError | SAXException | JMSException e) {
-            throw new KapuaEventBusException(e);
+            throw new ServiceEventBusException(e);
         }
     }
 
@@ -65,6 +65,6 @@ public abstract class EventBusMarshaler {
      * @param kapuaEvent
      * @throws KapuaException
      */
-    public abstract void marshal(TextMessage textMessage, KapuaEvent kapuaEvent) throws KapuaException;
+    public abstract void marshal(TextMessage textMessage, ServiceEvent kapuaEvent) throws KapuaException;
 
 }

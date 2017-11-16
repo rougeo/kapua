@@ -11,22 +11,11 @@
  *******************************************************************************/
 package org.eclipse.kapua.commons.event.service.api;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import org.eclipse.kapua.model.KapuaUpdatableEntityPredicates;
 
-import org.eclipse.kapua.model.query.KapuaListResult;
+public interface ServiceEventStorePredicates extends KapuaUpdatableEntityPredicates {
 
-/**
- * KapuaEvent result list definition.
- * 
- * @since 1.0
- *
- */
-@XmlRootElement(name = "kapuaEventListResult")
-@XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(factoryClass = KapuaEventStoreXmlRegistry.class,factoryMethod = "newKapuaEventListResult")
-public interface KapuaEventListResult extends KapuaListResult<Event> {
+    public static final String EVENT_STATUS = "status";
+    public static final String SERVICE_NAME = "service";
 
 }

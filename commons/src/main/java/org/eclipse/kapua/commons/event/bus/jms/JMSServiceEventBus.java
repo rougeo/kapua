@@ -19,16 +19,16 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.KapuaRuntimeException;
-import org.eclipse.kapua.commons.event.EventScope;
-import org.eclipse.kapua.commons.event.bus.EventBusMarshaler;
+import org.eclipse.kapua.commons.event.ServiceEventMarshaler;
+import org.eclipse.kapua.commons.event.ServiceEventScope;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.commons.setting.system.SystemSetting;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
-import org.eclipse.kapua.service.event.KapuaEvent;
-import org.eclipse.kapua.service.event.KapuaEventBus;
-import org.eclipse.kapua.service.event.KapuaEventBusException;
-import org.eclipse.kapua.service.event.KapuaEventBusListener;
+import org.eclipse.kapua.service.event.ServiceEvent;
+import org.eclipse.kapua.service.event.ServiceEventBus;
+import org.eclipse.kapua.service.event.ServiceEventBusException;
+import org.eclipse.kapua.service.event.ServiceEventBusListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +55,9 @@ import java.util.Map;
  * 
  * @since 1.0
  */
-public class JMSEventBus implements KapuaEventBus, ExceptionListener {
+public class JMSServiceEventBus implements ServiceEventBus, ExceptionListener {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(JMSEventBus.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(JMSServiceEventBus.class);
 
     private final static int PRODUCER_POOL_MIN_SIZE = SystemSetting.getInstance().getInt(SystemSettingKey.EVENT_BUS_PRODUCER_POOL_MIN_SIZE);
     private final static int PRODUCER_POOL_MAX_SIZE = SystemSetting.getInstance().getInt(SystemSettingKey.EVENT_BUS_PRODUCER_POOL_MAX_SIZE);
@@ -68,68 +68,68 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
 
     private List<Subscription> subscriptionList = new ArrayList<>();
     private EventBusJMSConnectionBridge eventBusJMSConnectionBridge;
-    private EventBusMarshaler eventBusMarshaler;
+    private ServiceEventMarshaler eventBusMarshaler;
 
     /**
      * Default constructor
      * 
-     * @throws KapuaEventBusException
+     * @throws ServiceEventBusException
      * @throws JMSException
      */
-    public JMSEventBus() throws KapuaEventBusException, JMSException {
+    public JMSServiceEventBus() throws ServiceEventBusException, JMSException {
         eventBusJMSConnectionBridge = new EventBusJMSConnectionBridge(this);
     }
 
     /**
      * Start the event bus
      * 
-     * @throws KapuaEventBusException
+     * @throws ServiceEventBusException
      */
-    public void start() throws KapuaEventBusException {
+    public void start() throws ServiceEventBusException {
         try {
             //initialize event bus marshaler
             Class<?> messageSerializerClazz = Class.forName(MESSAGE_SERIALIZER);
-            if (EventBusMarshaler.class.isAssignableFrom(messageSerializerClazz)) {
-                eventBusMarshaler = (EventBusMarshaler) messageSerializerClazz.newInstance();
+            if (ServiceEventMarshaler.class.isAssignableFrom(messageSerializerClazz)) {
+                eventBusMarshaler = (ServiceEventMarshaler) messageSerializerClazz.newInstance();
             }
             else {
-                throw new KapuaEventBusException(String.format("Wrong message serializer Object type ('%s')!", messageSerializerClazz));
+                throw new ServiceEventBusException(String.format("Wrong message serializer Object type ('%s')!", messageSerializerClazz));
             }
 
             eventBusJMSConnectionBridge.start();
         } catch (JMSException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new KapuaEventBusException(e);
+            throw new ServiceEventBusException(e);
         }
     }
 
     @Override
-    public void publish(String address, KapuaEvent kapuaEvent) 
-            throws KapuaEventBusException {
+    public void publish(String address, ServiceEvent kapuaEvent) 
+            throws ServiceEventBusException {
         eventBusJMSConnectionBridge.publish(address, kapuaEvent);
     }
 
     @Override
-    public synchronized void subscribe(String address, String name, final KapuaEventBusListener kapuaEventListener)
-            throws KapuaEventBusException {
+    public synchronized void subscribe(String address, String name, final ServiceEventBusListener kapuaEventListener)
+            throws ServiceEventBusException {
         try {
             Subscription subscription = new Subscription(address, name, kapuaEventListener);
             subscriptionList.add(subscription);
             eventBusJMSConnectionBridge.subscribe(subscription);
-        } catch (KapuaEventBusException e) {
-            throw new KapuaEventBusException(e);
+        } catch (ServiceEventBusException e) {
+            throw new ServiceEventBusException(e);
         }
     }
 
-    private final void setSession(KapuaEvent kapuaEvent) {
+    private final void setSession(ServiceEvent kapuaEvent) {
         KapuaSession.createFrom(kapuaEvent.getScopeId(), kapuaEvent.getUserId());
     }
 
     /**
      * Stop the event bus
      * 
-     * @throws KapuaEventBusException
+     * @throws ServiceEventBusException
      */
-    public void stop() throws KapuaEventBusException {
+    public void stop() throws ServiceEventBusException {
         eventBusJMSConnectionBridge.stop();
     }
 
@@ -144,7 +144,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
                 LOGGER.info("EventBus restarting attempt... {} DONE", i);
                 LOGGER.info("EventBus connection RESTORED");
                 break;
-            } catch (KapuaEventBusException | JMSException e1) {
+            } catch (ServiceEventBusException | JMSException e1) {
                 LOGGER.error("Cannot start new event bus connection... try again...", e1);
                 waitBeforeRetry();
             }
@@ -161,7 +161,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
         }
     }
 
-    private void restart() throws KapuaEventBusException, JMSException {
+    private void restart() throws ServiceEventBusException, JMSException {
         // restart the event bus connection bridge with a new instance
         // so no synchronization is needed
         EventBusJMSConnectionBridge instanceToCleanUp = null;
@@ -186,7 +186,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
                 else {
                     LOGGER.warn("Null old JMSConnectionBridge instance. no cleanup will be done...");
                 }
-            } catch (KapuaEventBusException e) {
+            } catch (ServiceEventBusException e) {
                 LOGGER.error("Cannot destroy old event bus connection: {}", e.getMessage(), e);
             } finally {
                 instanceToCleanUp = null;
@@ -213,13 +213,13 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
             jmsConnection.start();
         }
 
-        void stop() throws KapuaEventBusException {
+        void stop() throws ServiceEventBusException {
             try {
                 if (jmsConnection != null) {
                     jmsConnection.close();
                 }
             } catch (JMSException e) {
-                throw new KapuaEventBusException(e);
+                throw new ServiceEventBusException(e);
             }
             finally {
                 jmsConnection = null;
@@ -235,8 +235,8 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
             }
         }
 
-        void publish(String address, KapuaEvent kapuaEvent)
-                throws KapuaEventBusException {
+        void publish(String address, ServiceEvent kapuaEvent)
+                throws ServiceEventBusException {
             if (address != null && address.trim().length() > 0) {
                 SenderPool senderPool = senders.get(address);
                 Sender sender = null;
@@ -253,7 +253,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
                     sender = senderPool.borrowObject();
                     sender.sendMessage(kapuaEvent);
                 } catch (Exception e) {
-                    throw new KapuaEventBusException(e);
+                    throw new ServiceEventBusException(e);
                 } finally {
                     if (sender != null) {
                         senderPool.returnObject(sender);
@@ -265,7 +265,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
         }
 
         synchronized void subscribe(Subscription subscription)
-                throws KapuaEventBusException {
+                throws ServiceEventBusException {
             try {
                 String subscriptionStr = String.format("events.%s", subscription.getAddress());
                 // create a bunch of sessions to allow parallel event processing
@@ -280,15 +280,15 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
                             try {
                                 if (message instanceof TextMessage) {
                                     TextMessage textMessage = (TextMessage) message;
-                                    final KapuaEvent kapuaEvent = eventBusMarshaler.unmarshal(textMessage);
+                                    final ServiceEvent kapuaEvent = eventBusMarshaler.unmarshal(textMessage);
                                     setSession(kapuaEvent);
                                     KapuaSecurityUtils.doPrivileged(() -> {
                                         try {
                                             // restore event context
-                                            EventScope.set(kapuaEvent);
+                                            ServiceEventScope.set(kapuaEvent);
                                             subscription.getKapuaEventListener().onKapuaEvent(kapuaEvent);
                                         } finally {
-                                            EventScope.end();
+                                            ServiceEventScope.end();
                                         }
                                     });
 
@@ -304,7 +304,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
                     });
                 }
             } catch (JMSException e) {
-                throw new KapuaEventBusException(e);
+                throw new ServiceEventBusException(e);
             }
         }
 
@@ -321,7 +321,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
                 jmsProducer = jmsSession.createProducer(jmsTopic);
             }
 
-            public void sendMessage(KapuaEvent kapuaEvent) throws Exception {
+            public void sendMessage(ServiceEvent kapuaEvent) throws Exception {
                 try {
                     TextMessage message = jmsSession.createTextMessage();
                     // Serialize outgoing kapua event based on platform configuration
@@ -357,7 +357,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
                 try {
                     return new Sender(jmsConnection, address);
                 } catch (JMSException e) {
-                    throw new KapuaEventBusException(e);
+                    throw new ServiceEventBusException(e);
                 }
             }
 
@@ -404,9 +404,9 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
 
         String name;
         String address;
-        KapuaEventBusListener kapuaEventListener;
+        ServiceEventBusListener kapuaEventListener;
 
-        public Subscription(String address, String name, KapuaEventBusListener kapuaEventListener) {
+        public Subscription(String address, String name, ServiceEventBusListener kapuaEventListener) {
             this.name = name;
             this.address = address;
             this.kapuaEventListener = kapuaEventListener;
@@ -420,7 +420,7 @@ public class JMSEventBus implements KapuaEventBus, ExceptionListener {
             return address;
         }
 
-        public KapuaEventBusListener getKapuaEventListener() {
+        public ServiceEventBusListener getKapuaEventListener() {
             return kapuaEventListener;
         }
 

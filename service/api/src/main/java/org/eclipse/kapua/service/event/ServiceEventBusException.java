@@ -20,7 +20,7 @@ import org.eclipse.kapua.KapuaException;
  * @since 1.0
  *
  */
-public class KapuaEventBusException extends KapuaException {
+public class ServiceEventBusException extends KapuaException {
 
     private static final long serialVersionUID = -7004520562049645299L;
 
@@ -29,7 +29,7 @@ public class KapuaEventBusException extends KapuaException {
      * 
      * @param cause
      */
-    public KapuaEventBusException(Throwable cause) {
+    public ServiceEventBusException(Throwable cause) {
         // TODO Add error code for event bus
         super(KapuaErrorCodes.INTERNAL_ERROR, cause, (Object[])null);
     }
@@ -39,7 +39,7 @@ public class KapuaEventBusException extends KapuaException {
      * 
      * @param message
      */
-    public KapuaEventBusException(String message) {
+    public ServiceEventBusException(String message) {
         // TODO Add error code for event bus
         super(KapuaErrorCodes.INTERNAL_ERROR, message);
     }

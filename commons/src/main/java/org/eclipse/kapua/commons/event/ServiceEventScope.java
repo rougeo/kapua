@@ -14,7 +14,7 @@ package org.eclipse.kapua.commons.event;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.eclipse.kapua.service.event.KapuaEvent;
+import org.eclipse.kapua.service.event.ServiceEvent;
 
 /**
  * Utility class to handle the thread context event stack.
@@ -22,11 +22,11 @@ import org.eclipse.kapua.service.event.KapuaEvent;
  * @since 1.0
  *
  */
-public class EventScope {
+public class ServiceEventScope {
 
-    private static ThreadLocal<Stack<KapuaEvent>> eventContextThdLocal = new ThreadLocal<>();
+    private static ThreadLocal<Stack<ServiceEvent>> eventContextThdLocal = new ThreadLocal<>();
 
-    private EventScope() {
+    private ServiceEventScope() {
     }
 
     /**
@@ -34,10 +34,10 @@ public class EventScope {
      * 
      * @return
      */
-    public static KapuaEvent begin() {
+    public static ServiceEvent begin() {
 
         // Is it the first call in the stack? Is there already a Stack?
-        Stack<KapuaEvent> eventStack = eventContextThdLocal.get();
+        Stack<ServiceEvent> eventStack = eventContextThdLocal.get();
         if (eventStack == null) {
             eventStack = new Stack<>();
             eventContextThdLocal.set(eventStack);
@@ -46,13 +46,13 @@ public class EventScope {
         // Is it the first call in the stack?
         String contextId = null;
         if (!eventStack.empty()) {
-            KapuaEvent lastEvent = eventStack.peek();
+            ServiceEvent lastEvent = eventStack.peek();
             contextId = lastEvent.getContextId();
         } else {
             contextId = UUID.randomUUID().toString();
         }
 
-        KapuaEvent newEvent = new KapuaEvent();
+        ServiceEvent newEvent = new ServiceEvent();
         newEvent.setContextId(contextId);
         eventStack.push(newEvent);
         return eventStack.peek();
@@ -63,8 +63,8 @@ public class EventScope {
      * 
      * @param event
      */
-    public static void set(KapuaEvent event) {
-        Stack<KapuaEvent> eventStack = new Stack<>();
+    public static void set(ServiceEvent event) {
+        Stack<ServiceEvent> eventStack = new Stack<>();
         eventStack.push(event);
         eventContextThdLocal.set(eventStack);
     }
@@ -74,8 +74,8 @@ public class EventScope {
      * 
      * @return
      */
-    public static KapuaEvent get() {
-        Stack<KapuaEvent> tmp = eventContextThdLocal.get();
+    public static ServiceEvent get() {
+        Stack<ServiceEvent> tmp = eventContextThdLocal.get();
         if (tmp != null && !tmp.empty()) {
             return tmp.peek();
         }
@@ -86,7 +86,7 @@ public class EventScope {
      * Clean up the current thread context Kapua event stack
      */
     public static void end() {
-        Stack<KapuaEvent> eventStack = eventContextThdLocal.get();
+        Stack<ServiceEvent> eventStack = eventContextThdLocal.get();
         if (eventStack != null && !eventStack.empty()) {
             eventContextThdLocal.set(null);
         }

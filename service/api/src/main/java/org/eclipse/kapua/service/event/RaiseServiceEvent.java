@@ -9,10 +9,26 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.commons.event.service.api;
+package org.eclipse.kapua.service.event;
 
-import org.eclipse.kapua.model.KapuaEntityCreator;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public interface KapuaEventCreator extends KapuaEntityCreator<Event> {
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.ElementType;
 
+/**
+ * Raise event definition
+ * 
+ * @since 1.0
+ *
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface RaiseServiceEvent {
+
+    String service() default "";
+    String entityType() default "";
+    String operation() default "";
+    String note() default "";
 }

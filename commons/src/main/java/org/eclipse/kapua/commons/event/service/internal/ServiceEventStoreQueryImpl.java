@@ -11,28 +11,28 @@
  *******************************************************************************/
 package org.eclipse.kapua.commons.event.service.internal;
 
-import org.eclipse.kapua.commons.event.service.api.Event;
-import org.eclipse.kapua.commons.event.service.api.KapuaEventCreator;
-import org.eclipse.kapua.commons.model.AbstractKapuaEntityCreator;
+import org.eclipse.kapua.commons.event.service.api.ServiceEvent;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventStoreQuery;
+import org.eclipse.kapua.commons.model.query.predicate.AbstractKapuaQuery;
 import org.eclipse.kapua.model.id.KapuaId;
 
-/**
- * KapuaEvent creator service implementation.
- * 
- * @since 1.0
- * 
- */
-public class KapuaEventCreatorImpl extends AbstractKapuaEntityCreator<Event> implements KapuaEventCreator {
-
-    private static final long serialVersionUID = 1048699703033893534L;
+public class ServiceEventStoreQueryImpl extends AbstractKapuaQuery<ServiceEvent> implements ServiceEventStoreQuery {
 
     /**
      * Constructor
-     * 
+     */
+    public ServiceEventStoreQueryImpl() {
+        super();
+    }
+
+    /**
+     * Constructor
+     *
      * @param scopeId
      */
-    public KapuaEventCreatorImpl(KapuaId scopeId) {
-        super(scopeId);
+    public ServiceEventStoreQueryImpl(KapuaId scopeId) {
+        this();
+        setScopeId(scopeId);
     }
 
 }

@@ -25,7 +25,7 @@ import javax.persistence.Version;
 
 @Entity
 @Table(name = "sys_service_event_housekeeping")
-public class KapuaEventHousekeeper implements Serializable {
+public class ServiceEventHousekeeper implements Serializable {
 
     private static final long serialVersionUID = 1900974835246471451L;
 

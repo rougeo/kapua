@@ -25,15 +25,15 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.eclipse.kapua.commons.event.service.api.Event;
+import org.eclipse.kapua.commons.event.service.api.ServiceEvent;
 import org.eclipse.kapua.commons.model.AbstractKapuaUpdatableEntity;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.model.id.KapuaId;
-import org.eclipse.kapua.service.event.KapuaEvent.EventStatus;
+import org.eclipse.kapua.service.event.ServiceEvent.EventStatus;
 
 @Entity(name = "KapuaEvent")
 @Table(name = "sys_service_event")
-public class KapuaEventImpl extends AbstractKapuaUpdatableEntity implements Event {
+public class ServiceEventImpl extends AbstractKapuaUpdatableEntity implements ServiceEvent {
 
     private static final long serialVersionUID = -2416000835110726619L;
 
@@ -85,11 +85,11 @@ public class KapuaEventImpl extends AbstractKapuaUpdatableEntity implements Even
     @Column(name = "note", nullable = true, updatable = true)
     private String note;
 
-    public KapuaEventImpl() {
+    public ServiceEventImpl() {
         status = EventStatus.TRIGGERED;
     }
 
-    public KapuaEventImpl(KapuaId scopeId) {
+    public ServiceEventImpl(KapuaId scopeId) {
         setScopeId(scopeId);
     }
 

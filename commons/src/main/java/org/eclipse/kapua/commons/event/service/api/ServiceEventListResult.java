@@ -16,16 +16,17 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.eclipse.kapua.model.query.KapuaQuery;
+import org.eclipse.kapua.model.query.KapuaListResult;
 
 /**
- * KapuaEvent query definition.
+ * KapuaEvent result list definition.
  * 
  * @since 1.0
- * 
+ *
  */
-@XmlRootElement(name = "query")
+@XmlRootElement(name = "kapuaEventListResult")
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(factoryClass = KapuaEventStoreXmlRegistry.class, factoryMethod = "newQuery")
-public interface KapuaEventStoreQuery extends KapuaQuery<Event> {
+@XmlType(factoryClass = ServiceEventStoreXmlRegistry.class,factoryMethod = "newKapuaEventListResult")
+public interface ServiceEventListResult extends KapuaListResult<ServiceEvent> {
+
 }

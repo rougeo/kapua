@@ -25,8 +25,8 @@ import org.eclipse.kapua.service.KapuaUpdatableEntityService;
  * @since 1.0
  * 
  */
-public interface KapuaEventStoreService extends KapuaEntityService<Event, KapuaEventCreator>,
-        KapuaUpdatableEntityService<Event> {
+public interface ServiceEventStoreService extends KapuaEntityService<ServiceEvent, ServiceEventCreator>,
+        KapuaUpdatableEntityService<ServiceEvent> {
 
     /**
      * Finds the kapuaEvent by kapuaEvent identifiers
@@ -35,19 +35,19 @@ public interface KapuaEventStoreService extends KapuaEntityService<Event, KapuaE
      * @return
      * @throws KapuaException
      */
-    public Event find(KapuaId id)
+    public ServiceEvent find(KapuaId id)
             throws KapuaException;
 
     /**
-     * Returns the {@link KapuaEventListResult} with elements matching the provided query.
+     * Returns the {@link ServiceEventListResult} with elements matching the provided query.
      * 
      * @param query
-     *            The {@link KapuaEventStoreQuery} used to filter results.
-     * @return The {@link KapuaEventListResult} with elements matching the query parameter.
+     *            The {@link ServiceEventStoreQuery} used to filter results.
+     * @return The {@link ServiceEventListResult} with elements matching the query parameter.
      * @throws KapuaException
      * @since 1.0.0
      */
-    public KapuaEventListResult query(KapuaQuery<Event> query)
+    public ServiceEventListResult query(KapuaQuery<ServiceEvent> query)
             throws KapuaException;
 
 }

@@ -16,18 +16,18 @@ import javax.xml.bind.annotation.XmlRegistry;
 import org.eclipse.kapua.locator.KapuaLocator;
 
 @XmlRegistry
-public class KapuaEventStoreXmlRegistry {
+public class ServiceEventStoreXmlRegistry {
 
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
-    private final KapuaEventStoreFactory kapuaEventFactory = locator.getFactory(KapuaEventStoreFactory.class);
+    private final ServiceEventStoreFactory kapuaEventFactory = locator.getFactory(ServiceEventStoreFactory.class);
 
     /**
      * Creates a new kapuaEvent instance
      * 
      * @return
      */
-    public Event newKapuaEvent() {
+    public ServiceEvent newKapuaEvent() {
         return kapuaEventFactory.newEntity(null);
     }
 
@@ -36,7 +36,7 @@ public class KapuaEventStoreXmlRegistry {
      * 
      * @return
      */
-    public KapuaEventCreator newKapuaEventCreator() {
+    public ServiceEventCreator newKapuaEventCreator() {
         return kapuaEventFactory.newCreator(null);
     }
 
@@ -45,11 +45,11 @@ public class KapuaEventStoreXmlRegistry {
      * 
      * @return
      */
-    public KapuaEventListResult newKapuaEventListResult() {
+    public ServiceEventListResult newKapuaEventListResult() {
         return kapuaEventFactory.newListResult();
     }
 
-    public KapuaEventStoreQuery newQuery() {
+    public ServiceEventStoreQuery newQuery() {
         return kapuaEventFactory.newQuery(null);
     }
 

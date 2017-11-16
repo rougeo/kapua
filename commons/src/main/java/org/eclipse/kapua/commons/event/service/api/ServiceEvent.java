@@ -20,12 +20,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.eclipse.kapua.commons.event.service.api.KapuaEventStoreXmlRegistry;
+import org.eclipse.kapua.commons.event.service.api.ServiceEventStoreXmlRegistry;
 import org.eclipse.kapua.model.KapuaUpdatableEntity;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.id.KapuaIdAdapter;
 import org.eclipse.kapua.model.xml.DateXmlAdapter;
-import org.eclipse.kapua.service.event.KapuaEvent.EventStatus;
+import org.eclipse.kapua.service.event.ServiceEvent.EventStatus;
 
 @XmlRootElement(name = "event")
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -42,9 +42,9 @@ import org.eclipse.kapua.service.event.KapuaEvent.EventStatus;
         "status",
         "note",
 }, //
-        factoryClass = KapuaEventStoreXmlRegistry.class, //
+        factoryClass = ServiceEventStoreXmlRegistry.class, //
         factoryMethod = "newKapuaEvent")
-public interface Event extends KapuaUpdatableEntity {
+public interface ServiceEvent extends KapuaUpdatableEntity {
 
     public static final String TYPE = "kapuaEvent";
 

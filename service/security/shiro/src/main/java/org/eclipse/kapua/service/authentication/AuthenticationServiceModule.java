@@ -21,16 +21,16 @@ import javax.inject.Inject;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.core.ServiceModule;
-import org.eclipse.kapua.commons.event.EventStoreHouseKeeperJob;
+import org.eclipse.kapua.commons.event.ServiceEventStoreHouseKeeperJob;
 import org.eclipse.kapua.commons.event.ServiceMap;
-import org.eclipse.kapua.commons.event.bus.EventBusManager;
+import org.eclipse.kapua.commons.event.bus.ServiceEventBusManager;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.service.authentication.credential.CredentialService;
 import org.eclipse.kapua.service.authentication.shiro.AuthenticationEntityManagerFactory;
 import org.eclipse.kapua.service.authentication.shiro.setting.KapuaAuthenticationSetting;
 import org.eclipse.kapua.service.authentication.shiro.setting.KapuaAuthenticationSettingKeys;
 import org.eclipse.kapua.service.authentication.token.AccessTokenService;
-import org.eclipse.kapua.service.event.KapuaEventBus;
+import org.eclipse.kapua.service.event.ServiceEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +52,12 @@ public class AuthenticationServiceModule implements ServiceModule {
     private List<String> servicesNames;
     private ScheduledExecutorService houseKeeperScheduler;
     private ScheduledFuture<?> houseKeeperHandler;
-    private EventStoreHouseKeeperJob houseKeeperJob;
+    private ServiceEventStoreHouseKeeperJob houseKeeperJob;
 
     @Override
     public void start() throws KapuaException {
 
-        KapuaEventBus eventbus = EventBusManager.getInstance();
+        ServiceEventBus eventbus = ServiceEventBusManager.getInstance();
 
         // Listen to upstream service events
         eventbus.subscribe("user", "user-credential", credentialService);
@@ -72,7 +72,7 @@ public class AuthenticationServiceModule implements ServiceModule {
 
         // Start the House keeper
         houseKeeperScheduler = Executors.newScheduledThreadPool(1);
-        houseKeeperJob = new EventStoreHouseKeeperJob(AuthenticationEntityManagerFactory.getInstance(), eventbus, serviceInternalEventAddress, servicesNames);
+        houseKeeperJob = new ServiceEventStoreHouseKeeperJob(AuthenticationEntityManagerFactory.getInstance(), eventbus, serviceInternalEventAddress, servicesNames);
         // Start time can be made random from 0 to 30 seconds
         houseKeeperHandler = houseKeeperScheduler.scheduleAtFixedRate(houseKeeperJob, SCHEDULED_EXECUTION_TIME_WINDOW, SCHEDULED_EXECUTION_TIME_WINDOW, TimeUnit.SECONDS);
     }
