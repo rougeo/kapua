@@ -46,7 +46,11 @@ public enum KapuaAuthenticationSettingKeys implements SettingKey {
 
     //event queues
     AUTHENTICATION_INTERNAL_EVENT_ADDRESS("authentication.internalEventAddress"),
-    AUTHENTICATION_SERVICES_NAMES("authentication.servicesNames");
+    AUTHENTICATION_SERVICES_NAMES("authentication.servicesNames"),
+    USER_EVENT_ADDRESS("user.eventAddress"),
+    ACCOUNT_EVENT_ADDRESS("account.eventAddress"),
+    ACCESS_TOKEN_SUBSCRIPTION_NAME("accessToken.subscriptionName"),
+    CREDENTIAL_SUBSCRIPTION_NAME("credential.subscriptionName");
 
     private String key;
 
