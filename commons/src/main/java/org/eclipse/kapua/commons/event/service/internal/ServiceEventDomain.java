@@ -65,4 +65,14 @@ public class ServiceEventDomain extends AbstractKapuaEntity implements Domain {
     public Set<Actions> getActions() {
         return actions;
     }
+
+    @Override
+    public void setGroupable(boolean groupable) {
+        //this domain is not groupable so the set method doesn't set any field
+    }
+
+    @Override
+    public boolean getGroupable() {
+        return false;
+    }
 }
