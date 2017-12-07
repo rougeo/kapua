@@ -169,7 +169,7 @@
         </transportConnectors>
     </broker>
 
-    <import resource="camel.xml"/>
-    <!--<import resource="camel-experimental.xml"/>-->
+    <!-- <import resource="camel.xml"/> -->
+    <!--<import resource="camel-experimental.xml"/> -->
 
 </beans>

@@ -112,6 +112,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
 
     private final static Map<String, ConnectionId> CONNECTION_MAP = new ConcurrentHashMap<>();
     private final static String CONNECTOR_NAME_VM = String.format("vm://%s", BrokerSetting.getInstance().getString(BrokerSettingKey.BROKER_NAME));
+    private final static String CONNECTOR_NAME_TCP = "tcp";
 
     private static final Domain BROKER_DOMAIN = new BrokerDomain();
     private static final Domain DATASTORE_DOMAIN = new DatastoreDomain();
@@ -231,7 +232,8 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
      */
     private boolean isPassThroughConnection(ConnectionContext context) {
         if (context != null) {
-            if (context.getConnector() == null || CONNECTOR_NAME_VM.equals(((TransportConnector) context.getConnector()).getName())) {
+            if (context.getConnector() == null || CONNECTOR_NAME_VM.equals(((TransportConnector) context.getConnector()).getName())
+                    || CONNECTOR_NAME_TCP.equals(((TransportConnector) context.getConnector()).getName())) {
                 return true;
             }
 
