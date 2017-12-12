@@ -90,6 +90,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.Timer.Context;
+import com.google.common.collect.ImmutableList;
 
 /**
  * ActiveMQ broker filter plugin implementation (security filter).<br>
@@ -105,6 +106,13 @@ import com.codahale.metrics.Timer.Context;
 public class KapuaSecurityBrokerFilter extends BrokerFilter implements AuthenticationCallback {
 
     protected final static Logger logger = LoggerFactory.getLogger(KapuaSecurityBrokerFilter.class);
+
+    protected final static List<String> VT_DURABLE_PREFIX = ImmutableList.of(
+            "Consumer.{0}:AT_LEAST_ONCE.{1}", "Consumer.{0}:EXACTLY_ONCE.{1}");
+    protected final static String VT_CONSUMER_PREFIX = "Consumer";
+    // full client id, with account prepended
+    protected final static String MULTI_ACCOUNT_CLIENT_ID = "{0}:{1}";
+    public static final String VT_TOPIC_PREFIX = "VirtualTopic.";
 
     private final static String CONNECT_MESSAGE_TOPIC_PATTERN = "VirtualTopic.%s.%s.%s.MQTT.CONNECT";
     private final static String CANNOT_LOAD_INSTANCE_ERROR_MSG = "Cannot load instance %s for %s. Please check the configuration file!";
@@ -148,8 +156,8 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter implements Authentic
 
     public KapuaSecurityBrokerFilter(Broker next) throws KapuaException {
         super(next);
-        adminAuthenticationLogic = new AdminAuthenticationLogic();
-        userAuthentictionLogic = new UserAuthentictionLogic();
+        adminAuthenticationLogic = new AdminAuthenticationLogic(VT_TOPIC_PREFIX, SystemSetting.getInstance().getMessageClassifier(), "ActiveMQ.Advisory.>");
+        userAuthentictionLogic = new UserAuthentictionLogic(VT_TOPIC_PREFIX, SystemSetting.getInstance().getMessageClassifier(), "ActiveMQ.Advisory.>");
 
         XmlUtil.setContextProvider(new BrokerJAXBContextProvider());
     }
@@ -297,7 +305,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter implements Authentic
                             logger.debug("Invalid message context. Try parsing the topic.");
                             throw new KapuaException(KapuaErrorCodes.ILLEGAL_ARGUMENT, "Invalid message context");
                         }
-                        return new KapuaConnectionContext(scopeId, clientId);
+                        return new KapuaConnectionContext(scopeId, clientId, MULTI_ACCOUNT_CLIENT_ID);
                     }
 
                     private KapuaConnectionContext parseTopicInfo(javax.jms.Message message) throws JMSException, KapuaException {
@@ -311,7 +319,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter implements Authentic
                         String clientId = topic[2];
                         Account account = KapuaSecurityUtils.doPrivileged(() -> accountService.findByName(accountName));
                         Long scopeId = account.getId().getId().longValue();
-                        return new KapuaConnectionContext(scopeId, clientId);
+                        return new KapuaConnectionContext(scopeId, clientId, MULTI_ACCOUNT_CLIENT_ID);
                     }
 
                 });
@@ -428,7 +436,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter implements Authentic
             }
 
             kcc.update(accessToken, account.getName(), accessToken.getScopeId(), accessToken.getUserId(), (((TransportConnector) context.getConnector()).getName()),
-                    brokerIpResolver.getBrokerIpOrHostName());
+                    brokerIpResolver.getBrokerIpOrHostName(), MULTI_ACCOUNT_CLIENT_ID);
             loginShiroLoginTimeContext.stop();
 
             DefaultAuthorizationMap authMap = null;
@@ -615,7 +623,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter implements Authentic
         ActiveMQDestination destination = messageSend.getDestination();
         if (destination instanceof ActiveMQTopic) {
             ActiveMQTopic destinationTopic = (ActiveMQTopic) destination;
-            messageSend.setProperty(MessageConstants.PROPERTY_ORIGINAL_TOPIC, destinationTopic.getTopicName().substring(AclConstants.VT_TOPIC_PREFIX.length()));
+            messageSend.setProperty(MessageConstants.PROPERTY_ORIGINAL_TOPIC, destinationTopic.getTopicName().substring(VT_TOPIC_PREFIX.length()));
         }
         publishMetric.getAllowedMessages().inc();
         super.send(producerExchange, messageSend);
@@ -645,7 +653,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter implements Authentic
             String[] destinationsPath = info.getDestination().getDestinationPaths();
             String destination = info.getDestination().getPhysicalName();
             KapuaSecurityContext kapuaSecurityContext = getKapuaSecurityContext(context);
-            if (destinationsPath != null && destinationsPath.length >= 2 && destinationsPath[0].equals(AclConstants.VT_CONSUMER_PREFIX)) {
+            if (destinationsPath != null && destinationsPath.length >= 2 && destinationsPath[0].equals(VT_CONSUMER_PREFIX)) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(destination.substring(0, destinationsPath[0].length() + 1));
                 sb.append(context.getClientId());
@@ -702,10 +710,10 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter implements Authentic
             if (entry.getAcl().isRead()) {
                 // logger.info("pattern {} - clientid {} - topic {} - evaluated {}", new Object[]{JmsConstants.ACL_VT_DURABLE_PREFIX[0], clientId, topic,
                 // MessageFormat.format(JmsConstants.ACL_VT_DURABLE_PREFIX[0], fullClientId, topic)});
-                entries.add(createAuthorizationEntry(kcc, entry.getAcl(), MessageFormat.format(AclConstants.ACL_VT_DURABLE_PREFIX.get(0), kcc.getFullClientId(), entry.getAddress())));
+                entries.add(createAuthorizationEntry(kcc, entry.getAcl(), MessageFormat.format(VT_DURABLE_PREFIX.get(0), kcc.getFullClientId(), entry.getAddress())));
                 // logger.info("pattern {} - clientid {} - topic {} - evaluated {}", new Object[]{JmsConstants.ACL_VT_DURABLE_PREFIX[1], clientId, topic,
                 // MessageFormat.format(JmsConstants.ACL_VT_DURABLE_PREFIX[1], fullClientId, topic)});
-                entries.add(createAuthorizationEntry(kcc, entry.getAcl(), MessageFormat.format(AclConstants.ACL_VT_DURABLE_PREFIX.get(1), kcc.getFullClientId(), entry.getAddress())));
+                entries.add(createAuthorizationEntry(kcc, entry.getAcl(), MessageFormat.format(VT_DURABLE_PREFIX.get(1), kcc.getFullClientId(), entry.getAddress())));
             }
         }
         return new DefaultAuthorizationMap(entries);

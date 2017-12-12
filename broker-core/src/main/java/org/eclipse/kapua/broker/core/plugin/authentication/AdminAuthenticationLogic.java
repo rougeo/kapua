@@ -16,10 +16,13 @@ import java.util.List;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.broker.core.plugin.Acl;
-import org.eclipse.kapua.broker.core.plugin.AclConstants;
 import org.eclipse.kapua.broker.core.plugin.KapuaConnectionContext;
 
 public class AdminAuthenticationLogic extends AuthenticationLogic {
+
+    public AdminAuthenticationLogic(String addressPrefix, String addressClassifier, String advisoryPrefix) {
+        super(addressPrefix, addressClassifier, advisoryPrefix);
+    }
 
     @Override
     public List<AuthorizationEntry> connect(KapuaConnectionContext kcc, AuthenticationCallback authenticationCallback) throws KapuaException {
@@ -32,8 +35,8 @@ public class AdminAuthenticationLogic extends AuthenticationLogic {
 
     protected List<AuthorizationEntry> buildAuthorizationMap(KapuaConnectionContext kcc) {
         ArrayList<AuthorizationEntry> ael = new ArrayList<AuthorizationEntry>();
-        ael.add(createAuthorizationEntry(kcc, Acl.ALL, AclConstants.ACL_HASH));
-        ael.add(createAuthorizationEntry(kcc, Acl.WRITE_ADMIN, AclConstants.ACL_AMQ_ADVISORY));
+        ael.add(createAuthorizationEntry(kcc, Acl.ALL, aclHash));
+        ael.add(createAuthorizationEntry(kcc, Acl.WRITE_ADMIN, aclAdvisory));
         kcc.logAuthDestinationToLog();
         return ael;
     }

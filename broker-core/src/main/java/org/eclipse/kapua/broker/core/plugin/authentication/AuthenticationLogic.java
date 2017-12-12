@@ -18,7 +18,6 @@ import java.util.Map;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.broker.core.BrokerDomain;
 import org.eclipse.kapua.broker.core.plugin.Acl;
-import org.eclipse.kapua.broker.core.plugin.AclConstants;
 import org.eclipse.kapua.broker.core.plugin.KapuaConnectionContext;
 import org.eclipse.kapua.broker.core.plugin.metric.ClientMetric;
 import org.eclipse.kapua.broker.core.plugin.metric.LoginMetric;
@@ -49,6 +48,11 @@ public abstract class AuthenticationLogic {
 
     protected final static Logger logger = LoggerFactory.getLogger(AuthenticationLogic.class);
 
+    protected final static String PERMISSION_LOG = "{0}/{1}/{2} - {3}";
+
+    protected String aclHash;
+    protected String aclAdvisory;
+
     protected ClientMetric clientMetric = ClientMetric.getInstance();
     protected LoginMetric loginMetric = LoginMetric.getInstance();
     protected PublishMetric publishMetric = PublishMetric.getInstance();
@@ -64,6 +68,11 @@ public abstract class AuthenticationLogic {
     protected DeviceConnectionFactory deviceConnectionFactory = KapuaLocator.getInstance().getFactory(DeviceConnectionFactory.class);
     protected PermissionFactory permissionFactory = KapuaLocator.getInstance().getFactory(PermissionFactory.class);
     protected DeviceConnectionService deviceConnectionService = KapuaLocator.getInstance().getService(DeviceConnectionService.class);
+
+    protected AuthenticationLogic(String addressPrefix, String addressClassifier, String advisoryPrefix) {
+        aclHash = addressPrefix + ">";
+        aclAdvisory = addressPrefix + advisoryPrefix;
+    }
 
     public abstract List<org.eclipse.kapua.broker.core.plugin.authentication.AuthorizationEntry> connect(KapuaConnectionContext kcc, AuthenticationCallback authenticationCallback)
             throws KapuaException;
@@ -82,7 +91,7 @@ public abstract class AuthenticationLogic {
 
     protected AuthorizationEntry createAuthorizationEntry(KapuaConnectionContext kcc, Acl acl, String address) {
         AuthorizationEntry entry = new AuthorizationEntry(address, acl);
-        kcc.addAuthDestinationToLog(MessageFormat.format(AclConstants.PERMISSION_LOG,
+        kcc.addAuthDestinationToLog(MessageFormat.format(PERMISSION_LOG,
                 acl.isRead() ? "r" : "_",
                 acl.isWrite() ? "w" : "_",
                 acl.isAdmin() ? "a" : "_",

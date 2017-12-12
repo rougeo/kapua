@@ -51,10 +51,10 @@ public class KapuaConnectionContext {
     // use to track the allowed destinations for debug purpose
     private List<String> authDestinations;
 
-    public KapuaConnectionContext(Long scopeId, String clientId) {
+    public KapuaConnectionContext(Long scopeId, String clientId, String fullClientIdPattern) {
         authDestinations = new ArrayList<>();
         this.clientId = clientId;
-        updateFullClientId(scopeId);
+        updateFullClientId(scopeId, fullClientIdPattern);
     }
 
     public KapuaConnectionContext(String brokerId, ConnectionInfo info) {
@@ -66,7 +66,7 @@ public class KapuaConnectionContext {
         connectionId = info.getConnectionId().getValue();
     }
 
-    public KapuaConnectionContext(String brokerId, KapuaPrincipal kapuaPrincipal, ConnectionInfo info) {
+    public KapuaConnectionContext(String brokerId, KapuaPrincipal kapuaPrincipal, ConnectionInfo info, String fullClientIdPattern) {
         authDestinations = new ArrayList<>();
         this.brokerId = brokerId;
         userName = info.getUserName();
@@ -74,10 +74,10 @@ public class KapuaConnectionContext {
         scopeId = kapuaPrincipal.getAccountId();
         clientIp = info.getClientIp();
         connectionId = info.getConnectionId().getValue();
-        updateFullClientId();
+        updateFullClientId(fullClientIdPattern);
     }
 
-    public void update(AccessToken accessToken, String accountName, KapuaId scopeId, KapuaId userId, String connectorName, String brokerIpOrHostName) {
+    public void update(AccessToken accessToken, String accountName, KapuaId scopeId, KapuaId userId, String connectorName, String brokerIpOrHostName, String fullClientIdPattern) {
         this.accountName = accountName;
         this.scopeId = scopeId;
         this.userId = userId;
@@ -86,7 +86,7 @@ public class KapuaConnectionContext {
         if (connectorDescriptor == null) {
             throw new IllegalStateException(String.format("Unable to find connector descriptor for connector '%s'", connectorName));
         }
-        updateFullClientId();
+        updateFullClientId(fullClientIdPattern);
         principal = new KapuaPrincipalImpl(accessToken,
                 userName,
                 clientId,
@@ -105,12 +105,12 @@ public class KapuaConnectionContext {
         this.oldConnectionId = oldConnectionId;
     }
 
-    private void updateFullClientId() {
-        fullClientId = MessageFormat.format(AclConstants.MULTI_ACCOUNT_CLIENT_ID, scopeId.getId().longValue(), clientId);
+    private void updateFullClientId(String fullClientIdPattern) {
+        fullClientId = MessageFormat.format(fullClientIdPattern, scopeId.getId().longValue(), clientId);
     }
 
-    private void updateFullClientId(Long scopeId) {
-        fullClientId = MessageFormat.format(AclConstants.MULTI_ACCOUNT_CLIENT_ID, scopeId, clientId);
+    private void updateFullClientId(Long scopeId, String fullClientIdPattern) {
+        fullClientId = MessageFormat.format(fullClientIdPattern, scopeId, clientId);
     }
 
     public String getFullClientId() {

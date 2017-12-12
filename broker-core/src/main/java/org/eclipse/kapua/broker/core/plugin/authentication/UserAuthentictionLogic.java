@@ -18,7 +18,6 @@ import org.apache.shiro.ShiroException;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.KapuaIllegalAccessException;
 import org.eclipse.kapua.broker.core.plugin.Acl;
-import org.eclipse.kapua.broker.core.plugin.AclConstants;
 import org.eclipse.kapua.broker.core.plugin.KapuaConnectionContext;
 import org.eclipse.kapua.broker.core.plugin.KapuaDuplicateClientIdException;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
@@ -32,6 +31,30 @@ import com.codahale.metrics.Timer.Context;
 
 public class UserAuthentictionLogic extends AuthenticationLogic {
 
+    protected String aclCtrlAccReply;
+    protected String aclCtrlAccCliMqttLifeCycle;
+    protected String aclCtrlAcc;
+    protected String aclCtrlAccCli;
+    protected String aclDataAcc;
+    protected String aclDataAccCli;
+    protected String aclCtrlAccNotify;
+
+    protected static final int BROKER_CONNECT_IDX = 0;
+    protected static final int DEVICE_MANAGE_IDX = 1;
+    protected static final int DATA_VIEW_IDX = 2;
+    protected static final int DATA_MANAGE_IDX = 3;
+
+    public UserAuthentictionLogic(String addressPrefix, String addressClassifier, String advisoryPrefix) {
+        super(addressPrefix, addressClassifier, advisoryPrefix);
+        aclCtrlAccReply = addressPrefix + addressClassifier + ".{0}.*.*.REPLY.>";
+        aclCtrlAccCliMqttLifeCycle = addressPrefix + addressClassifier + ".{0}.{1}.MQTT.>";
+        aclCtrlAcc = addressPrefix + addressClassifier + ".{0}.>";
+        aclCtrlAccCli = addressPrefix + addressClassifier + ".{0}.{1}.>";
+        aclDataAcc = addressPrefix + "{0}.>";
+        aclDataAccCli = addressPrefix + "{0}.{1}.>";
+        aclCtrlAccNotify = addressPrefix + addressClassifier + ".{0}.*.*.NOTIFY.{1}.>";
+    }
+
     @Override
     public List<org.eclipse.kapua.broker.core.plugin.authentication.AuthorizationEntry> connect(KapuaConnectionContext kcc, AuthenticationCallback authenticationCallback) throws KapuaException {
         Context loginNormalUserTimeContext = loginMetric.getNormalUserTime().time();
@@ -43,7 +66,7 @@ public class UserAuthentictionLogic extends AuthenticationLogic {
                 authorizationService.isPermitted(permissionFactory.newPermission(DATASTORE_DOMAIN, Actions.read, kcc.getScopeId())),
                 authorizationService.isPermitted(permissionFactory.newPermission(DATASTORE_DOMAIN, Actions.write, kcc.getScopeId()))
         };
-        if (!hasPermissions[AclConstants.BROKER_CONNECT_IDX]) {
+        if (!hasPermissions[BROKER_CONNECT_IDX]) {
             throw new KapuaIllegalAccessException(permissionFactory.newPermission(BROKER_DOMAIN, Actions.connect, kcc.getScopeId()).toString());
         }
         loginCheckAccessTimeContext.stop();
@@ -142,28 +165,28 @@ public class UserAuthentictionLogic extends AuthenticationLogic {
 
     protected List<AuthorizationEntry> buildAuthorizationMap(KapuaConnectionContext kcc) {
         ArrayList<AuthorizationEntry> ael = new ArrayList<AuthorizationEntry>();
-        ael.add(createAuthorizationEntry(kcc, Acl.WRITE_ADMIN, AclConstants.ACL_AMQ_ADVISORY));
+        ael.add(createAuthorizationEntry(kcc, Acl.WRITE_ADMIN, aclAdvisory));
 
         // addConnection checks BROKER_CONNECT_IDX permission before call this method
         // then here user has BROKER_CONNECT_IDX permission and if check isn't needed
         // if (hasPermissions[BROKER_CONNECT_IDX]) {
-        if (kcc.getHasPermissions()[AclConstants.DEVICE_MANAGE_IDX]) {
-            ael.add(createAuthorizationEntry(kcc, Acl.ALL, formatAcl(AclConstants.ACL_CTRL_ACC, kcc)));
+        if (kcc.getHasPermissions()[DEVICE_MANAGE_IDX]) {
+            ael.add(createAuthorizationEntry(kcc, Acl.ALL, formatAcl(aclCtrlAcc, kcc)));
         } else {
-            ael.add(createAuthorizationEntry(kcc, Acl.ALL, formatAclFull(AclConstants.ACL_CTRL_ACC_CLI, kcc)));
+            ael.add(createAuthorizationEntry(kcc, Acl.ALL, formatAclFull(aclCtrlAccCli, kcc)));
         }
-        if (kcc.getHasPermissions()[AclConstants.DATA_MANAGE_IDX]) {
-            ael.add(createAuthorizationEntry(kcc, Acl.ALL, formatAcl(AclConstants.ACL_DATA_ACC, kcc)));
-        } else if (kcc.getHasPermissions()[AclConstants.DATA_VIEW_IDX]) {
-            ael.add(createAuthorizationEntry(kcc, Acl.READ_ADMIN, formatAcl(AclConstants.ACL_DATA_ACC, kcc)));
-            ael.add(createAuthorizationEntry(kcc, Acl.WRITE, formatAclFull(AclConstants.ACL_DATA_ACC_CLI, kcc)));
+        if (kcc.getHasPermissions()[DATA_MANAGE_IDX]) {
+            ael.add(createAuthorizationEntry(kcc, Acl.ALL, formatAcl(aclDataAcc, kcc)));
+        } else if (kcc.getHasPermissions()[DATA_VIEW_IDX]) {
+            ael.add(createAuthorizationEntry(kcc, Acl.READ_ADMIN, formatAcl(aclDataAcc, kcc)));
+            ael.add(createAuthorizationEntry(kcc, Acl.WRITE, formatAclFull(aclDataAccCli, kcc)));
         } else {
-            ael.add(createAuthorizationEntry(kcc, Acl.ALL, formatAclFull(AclConstants.ACL_DATA_ACC_CLI, kcc)));
+            ael.add(createAuthorizationEntry(kcc, Acl.ALL, formatAclFull(aclDataAccCli, kcc)));
         }
-        ael.add(createAuthorizationEntry(kcc, Acl.WRITE_ADMIN, formatAcl(AclConstants.ACL_CTRL_ACC_REPLY, kcc)));
+        ael.add(createAuthorizationEntry(kcc, Acl.WRITE_ADMIN, formatAcl(aclCtrlAccReply, kcc)));
 
         // Write notify to any client Id and any application and operation
-        ael.add(createAuthorizationEntry(kcc, Acl.WRITE, formatAclFull(AclConstants.ACL_CTRL_ACC_NOTIFY, kcc)));
+        ael.add(createAuthorizationEntry(kcc, Acl.WRITE, formatAclFull(aclCtrlAccNotify, kcc)));
 
         kcc.logAuthDestinationToLog();
 
