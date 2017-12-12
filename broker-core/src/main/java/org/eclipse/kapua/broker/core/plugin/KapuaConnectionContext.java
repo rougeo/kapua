@@ -15,7 +15,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.activemq.command.ConnectionId;
 import org.apache.activemq.command.ConnectionInfo;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.service.authentication.KapuaPrincipal;
@@ -37,14 +36,17 @@ public class KapuaConnectionContext {
     private KapuaPrincipal principal;
     private String userName;
     private KapuaId scopeId;
+    private KapuaId userId;
     private String accountName;
     private String clientId;
     private String fullClientId;
     private String clientIp;
-    private ConnectionId connectionId;
+    private String connectionId;
+    private String oldConnectionId;
     private KapuaId kapuaConnectionId;
     private ConnectorDescriptor connectorDescriptor;
     private boolean[] hasPermissions;
+    private String brokerIpOrHostName;
 
     // use to track the allowed destinations for debug purpose
     private List<String> authDestinations;
@@ -61,7 +63,7 @@ public class KapuaConnectionContext {
         userName = info.getUserName();
         clientId = info.getClientId();
         clientIp = info.getClientIp();
-        connectionId = info.getConnectionId();
+        connectionId = info.getConnectionId().getValue();
     }
 
     public KapuaConnectionContext(String brokerId, KapuaPrincipal kapuaPrincipal, ConnectionInfo info) {
@@ -71,13 +73,15 @@ public class KapuaConnectionContext {
         clientId = kapuaPrincipal.getClientId();
         scopeId = kapuaPrincipal.getAccountId();
         clientIp = info.getClientIp();
-        connectionId = info.getConnectionId();
+        connectionId = info.getConnectionId().getValue();
         updateFullClientId();
     }
 
-    public void update(AccessToken accessToken, String accountName, KapuaId scopeId, String connectorName) {
+    public void update(AccessToken accessToken, String accountName, KapuaId scopeId, KapuaId userId, String connectorName, String brokerIpOrHostName) {
         this.accountName = accountName;
         this.scopeId = scopeId;
+        this.userId = userId;
+        this.brokerIpOrHostName = brokerIpOrHostName;
         connectorDescriptor = ConnectorDescriptorProviders.getDescriptor(connectorName);
         if (connectorDescriptor == null) {
             throw new IllegalStateException(String.format("Unable to find connector descriptor for connector '%s'", connectorName));
@@ -93,8 +97,12 @@ public class KapuaConnectionContext {
         this.hasPermissions = hasPermissions;
     }
 
-    public void setKapuaConnectionId(DeviceConnection deviceConnection) {
+    public void updateKapuaConnectionId(DeviceConnection deviceConnection) {
         kapuaConnectionId = deviceConnection != null ? deviceConnection.getId() : null;
+    }
+
+    public void updateOldConnectionId(String oldConnectionId) {
+        this.oldConnectionId = oldConnectionId;
     }
 
     private void updateFullClientId() {
@@ -141,8 +149,12 @@ public class KapuaConnectionContext {
         return principal;
     }
 
-    public ConnectionId getConnectionId() {
+    public String getConnectionId() {
         return connectionId;
+    }
+
+    public String getOldConnectionId() {
+        return oldConnectionId;
     }
 
     public ConnectorDescriptor getConnectorDescriptor() {
@@ -153,8 +165,16 @@ public class KapuaConnectionContext {
         return kapuaConnectionId;
     }
 
+    public KapuaId getUserId() {
+        return userId;
+    }
+
     public boolean[] getHasPermissions() {
         return hasPermissions;
+    }
+
+    public String getBrokerIpOrHostName() {
+        return brokerIpOrHostName;
     }
 
     public void addAuthDestinationToLog(String message) {

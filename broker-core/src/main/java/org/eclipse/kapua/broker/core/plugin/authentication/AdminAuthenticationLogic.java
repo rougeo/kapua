@@ -14,18 +14,28 @@ package org.eclipse.kapua.broker.core.plugin.authentication;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.broker.core.plugin.Acl;
 import org.eclipse.kapua.broker.core.plugin.AclConstants;
 import org.eclipse.kapua.broker.core.plugin.KapuaConnectionContext;
 
 public class AdminAuthenticationLogic extends AuthenticationLogic {
 
-    public List<AuthorizationEntry> buildAuthorizationMap(KapuaConnectionContext kcc) {
+    @Override
+    public List<AuthorizationEntry> connect(KapuaConnectionContext kcc, AuthenticationCallback authenticationCallback) throws KapuaException {
+        return buildAuthorizationMap(kcc);
+    }
+
+    @Override
+    public void disconnect(KapuaConnectionContext kcc, AuthenticationCallback authenticationCallback, Throwable error) {
+    }
+
+    protected List<AuthorizationEntry> buildAuthorizationMap(KapuaConnectionContext kcc) {
         ArrayList<AuthorizationEntry> ael = new ArrayList<AuthorizationEntry>();
         ael.add(createAuthorizationEntry(kcc, Acl.ALL, AclConstants.ACL_HASH));
         ael.add(createAuthorizationEntry(kcc, Acl.WRITE_ADMIN, AclConstants.ACL_AMQ_ADVISORY));
-
         kcc.logAuthDestinationToLog();
         return ael;
     }
+
 }
