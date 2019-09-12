@@ -56,7 +56,7 @@
         <mariadb.version>1.4.6</mariadb.version>
         <mockito.version>1.10.19</mockito.version>
         <opencsv.version>3.7</opencsv.version>
-        <paho.version>1.1.0</paho.version>
+        <paho.version>1.2.1</paho.version>
         <poi.version>3.11</poi.version>
         <protobuf.version>2.6.1</protobuf.version>
         <reflections.version>0.9.10</reflections.version>
