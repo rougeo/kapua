@@ -23,7 +23,7 @@
     
     <properties>
         <jersey.version>2.23.2</jersey.version>
-        <swagger.version>1.5.12</swagger.version>
+        <swagger.version>1.5.24</swagger.version>
         <swagger-ui.version>2.1.4</swagger-ui.version>
     </properties>
 
@@ -329,11 +329,11 @@
                             <target>
                                 <echo>Swagger-ui: create doc dir</echo>
                                 <copy todir="${project.build.directory}/${project.build.finalName}/doc">
-                                    <fileset dir="${project.build.directory}/tmp/swagger-ui/" />
+                                    <fileset dir="${project.build.directory}/tmp/swagger-ui/"/>
                                 </copy>
                                 <echo>Swagger-ui-lib: create lib dir for swagger-ui</echo>
                                 <copy todir="${project.build.directory}/${project.build.finalName}/doc/lib">
-                                    <fileset dir="${project.build.directory}/tmp/swagger-ui-lib/" />
+                                    <fileset dir="${project.build.directory}/tmp/swagger-ui-lib/"/>
                                 </copy>
                             </target>
                         </configuration>
