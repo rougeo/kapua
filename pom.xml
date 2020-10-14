@@ -38,7 +38,7 @@
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>3.4</commons-lang.version>
         <commons-pool.version>2.3</commons-pool.version>
-        <cucumber.version>1.2.4</cucumber.version>
+        <cucumber.version>1.2.6</cucumber.version>
         <dropwizard.version>3.1.2</dropwizard.version>
         <eclipselink.version>2.6.3</eclipselink.version>
         <elasticsearch.version>2.3.4</elasticsearch.version>
@@ -51,7 +51,7 @@
         <javassist.version>3.19.0-GA</javassist.version>
         <javax-inject.version>1</javax-inject.version>
         <joda.version>2.9.4</joda.version>
-        <junit.version>4.11</junit.version>
+        <junit.version>4.13.1</junit.version>
         <liquibase.version>3.0.5</liquibase.version>
         <mariadb.version>1.4.6</mariadb.version>
         <mockito.version>1.10.19</mockito.version>
@@ -66,7 +66,7 @@
         <snakeyaml.version>1.15</snakeyaml.version>
         <swagger.version>1.5.12</swagger.version>
         <validation-api.version>1.1.0.Final</validation-api.version>
-        <cucumber.version>1.2.4</cucumber.version>
+        <cucumber.version>1.2.6</cucumber.version>
         <elasticsearch.version>5.3.0</elasticsearch.version>
         <elasticsearch-client-transport.version>5.3.0</elasticsearch-client-transport.version>
         <elasticsearch-client-rest.version>5.3.0</elasticsearch-client-rest.version>
