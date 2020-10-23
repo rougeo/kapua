@@ -41,7 +41,7 @@
         <cucumber.version>1.2.4</cucumber.version>
         <dropwizard.version>3.1.2</dropwizard.version>
         <eclipselink.version>2.6.3</eclipselink.version>
-        <elasticsearch.version>2.3.4</elasticsearch.version>
+        <elasticsearch.version>6.8.13</elasticsearch.version>
         <findbugs.version>2.0.1</findbugs.version>
         <gson.version>2.7</gson.version>
         <guava.version>19.0</guava.version>
@@ -67,8 +67,8 @@
         <swagger.version>1.5.12</swagger.version>
         <validation-api.version>1.1.0.Final</validation-api.version>
         <cucumber.version>1.2.4</cucumber.version>
-        <elasticsearch.version>5.3.0</elasticsearch.version>
-        <elasticsearch-client-transport.version>5.3.0</elasticsearch-client-transport.version>
+        <elasticsearch.version>6.8.13</elasticsearch.version>
+        <elasticsearch-client-transport.version>6.8.13</elasticsearch-client-transport.version>
         <elasticsearch-client-rest.version>5.3.0</elasticsearch-client-rest.version>
         <elasticsearch-netty-3.version>3.10.6.Final</elasticsearch-netty-3.version>
         <elasticsearch-netty-4.version>4.1.7.Final</elasticsearch-netty-4.version>
