@@ -52,7 +52,7 @@
         <javax-inject.version>1</javax-inject.version>
         <joda.version>2.9.4</joda.version>
         <junit.version>4.11</junit.version>
-        <liquibase.version>3.0.5</liquibase.version>
+        <liquibase.version>3.3.1</liquibase.version>
         <mariadb.version>1.4.6</mariadb.version>
         <mockito.version>1.10.19</mockito.version>
         <opencsv.version>3.7</opencsv.version>
@@ -62,7 +62,7 @@
         <reflections.version>0.9.10</reflections.version>
         <shiro.version>1.3.2</shiro.version>
         <slf4j.version>1.7.24</slf4j.version>
-        <logback.version>1.1.8</logback.version>
+        <logback.version>1.1.11</logback.version>
         <snakeyaml.version>1.15</snakeyaml.version>
         <swagger.version>1.5.12</swagger.version>
         <validation-api.version>1.1.0.Final</validation-api.version>
@@ -76,7 +76,7 @@
         <log4j-api.version>2.8.2</log4j-api.version> <!-- same version used by elasticsearch -->
         <log4j-to-slf4j.version>2.8.2</log4j-to-slf4j.version> <!-- same version used by elasticsearch -->
         <log4j2-mock.version>0.0.1</log4j2-mock.version>
-        <tomcat.version>8.0.41</tomcat.version>
+        <tomcat.version>8.5.5</tomcat.version>
 
         <!-- Plugins versions -->
         <checkstyle-maven-plugin.version>2.17</checkstyle-maven-plugin.version>
